@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "graphs.h"
+#include "backbone.h"
 
 void parse_command_line_args( int, char*[], int&, int&, int& );
 void usage_quit( char* );
@@ -21,7 +22,7 @@ int main( int argc, char *argv[] ) {
 
     // backbone tree and start node
     int signs[ num_verts ];
-    backbone_sign_assignment( g, root, num_verts );
+    backbone_sign_assignment( g, root, signs );
 
     // sign enurmoeration with binary tree
 
@@ -41,7 +42,7 @@ void parse_command_line_args( int argc, char *argv[], int &num_verts, int &num_a
     } else if ( num_verts < 2 ) {
         puts( "At least two vertices required" );
         usage_quit( argv[ 0 ] );
-    } else if ( num_arcs < num_vertices-1 ) {
+    } else if ( num_arcs < num_verts-1 ) {
         puts( "Need enough edges for the graph to be simple" );
         usage_quit( argv[ 0 ] );
     } else if ( num_errors > num_verts+num_arcs ) {
@@ -51,6 +52,6 @@ void parse_command_line_args( int argc, char *argv[], int &num_verts, int &num_a
 }
 
 void usage_quit( char *program_name ) {
-    printf( "Usage: %s num_vertices num_edges num_errors\n", argv[ 0 ] );
+    printf( "Usage: %s num_vertices num_edges num_errors\n", program_name );
     exit( 1 );
 }

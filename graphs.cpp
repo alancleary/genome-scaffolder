@@ -7,9 +7,10 @@ ScaffoldGraph generate_simple_scaffold_graph( int num_verts, int num_arcs, int s
     connected.push_back( num_verts-1 );
     ScaffoldGraph g( num_verts );
     int s, t;
-    edge_desc e, bool b;
+    edge_desc e;
+    bool b;
     for( int i = 0; i < num_arcs; i++ ) {
-        s = i%num_vertices;
+        s = i%num_verts;
         if( i < num_verts ) { 
             t = rand()%connected.size();
             tie( e, b ) = add_edge( s, connected[ t ], g );
@@ -69,14 +70,14 @@ void impose_error( ScaffoldGraph &g, int num_errors ) {
 // generates a simple scaffold graph with error
 ScaffoldGraph generate_simple_synthetic_graph( int num_verts, int num_arcs, int num_errors ) {
     int signs[ num_verts ];
-    generate_signs( signs );
+    generate_signs( signs, num_verts );
     ScaffoldGraph g = generate_simple_scaffold_graph( num_verts, num_arcs, signs );
-    impose_error( g );
+    impose_error( g, num_errors );
     return g;
 }
 
 // finds the highest degree vertice in the graph
-int highest_degree( const Graph &g ) {
+int highest_degree( const ScaffoldGraph &g ) {
     int highest_degree = 0,
         highest_vertice,
         compare_degree;

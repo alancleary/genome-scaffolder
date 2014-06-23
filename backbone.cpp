@@ -1,12 +1,14 @@
 
 #include "graphs.h"
+#include "backbone.h"
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
 
 // sets the weight of each edge to be the number of shared neighbors of the edge's vertices
 // the edges of each shared vertex vote on the label of the edge
 void assign_neighbor_weights_and_generate_labels( ScaffoldGraph &g, int *labels ) { 
-    edge_itr ei, ei_end,
-             s_ei, s_ei_end,
-             t_ei, t_ei_out;
+    edge_itr ei, ei_end;
+    out_edge_itr s_ei, s_ei_end,
+                 t_ei, t_ei_out;
     int s, s_i, t, vote;
     for( tie( ei, ei_end ) = edges( g ); ei != ei_end; ++ei ) { 
         vote = 0;
@@ -18,7 +20,7 @@ void assign_neighbor_weights_and_generate_labels( ScaffoldGraph &g, int *labels 
             } else {
                 s_i = source( *s_ei, g );
             }
-            for( tie( t_ei, t_ei_end ) = out_edges( t, g ); t_ei != t_ei_end; ++t_ei ) { 
+            for( tie( t_ei, t_ei_out ) = out_edges( t, g ); t_ei != t_ei_out; ++t_ei ) { 
                 if( s_i != t && ( s_i == source( *t_ei, g ) || s_i == target( *t_ei, g ) ) ) { 
                     g[ *ei ].weight += 1;
                     if( g[ *s_ei ].s_sign*g[ *s_ei ].t_sign == g[ *t_ei ].s_sign*g[ *t_ei ].t_sign ) {
@@ -45,9 +47,10 @@ void generate_signs( const ScaffoldGraph &g, std::vector<edge_desc> mst_edges, i
 
 // constructs spanning tree from majority weights makes signs assignment with spanning tree majority labels
 void backbone_sign_assignment( ScaffoldGraph &g, int root, int *signs ) {
+    property_map<ScaffoldGraph, int ScaffoldEdge::*>::type weight_property_map = get(&ScaffoldEdge::weight, g);
     int labels[ num_edges( g ) ];
-    assign_neighbor_weights( g, labels );
+    assign_neighbor_weights_and_generate_labels( g, labels );
     std::vector<edge_desc> mst_edges;
-    kruskal_minimum_spanning_tree( g, std::back_inserter( mst ), weight_map( weight_property_map ) );
+    kruskal_minimum_spanning_tree( g, std::back_inserter( mst_edges ), weight_map( weight_property_map ) );
     generate_signs( g, mst_edges, labels, root, signs );
 }
