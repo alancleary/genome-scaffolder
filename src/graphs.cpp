@@ -1,34 +1,39 @@
 
 #include "graphs.h"
 
-// generates a scaffold graph with no errors, except for cycles...
-ScaffoldGraph generate_simple_scaffold_graph( int num_verts, int num_arcs, int signs[] ) {
-    std::vector<int> connected;
-    connected.push_back( num_verts-1 );
+// generates a scaffold graph with no errors (an acyclic graph)
+ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] ) {
     ScaffoldGraph g( num_verts );
     int s, t;
     edge_desc e;
     bool b;
     for( int i = 0; i < num_arcs; i++ ) {
-        s = i%num_verts;
-        if( i < num_verts ) { 
-            t = rand()%connected.size();
-            tie( e, b ) = add_edge( s, connected[ t ], g );
-            connected.push_back( s );
-        } else {
-            b = false;
-            while( !b ) {
-                t = rand()%num_verts;
-                if( t != s && !edge( s, t, g ).second ) {
-                    tie( e, b ) = add_edge( s, t, g );
-                }
-            }
-        }
-        g[ e ].s = s;
-        g[ e ].s_sign = signs[ s ];
-        g[ e ].t = t;
-        g[ e ].t_sign = signs[ t ];
-        g[ e ].index = i;
+		// make sure the graph is connected
+		if( i < num_verts ) {
+			s = rand()%i;
+			t = i;
+		} else {
+			// in an acyclic ordering the last node is never a source
+			s = i%num_verts-1;
+			// the target needs come after the source in the ordering
+			t = rand()%(num_verts-s)+s+1;
+		}
+		// what's the orientation of the new edge?
+		tie( e, b ) = add_edge( s, t, g );
+		if( rand()%2 ) {
+			g[ e ].source.index = s;
+			g[ e ].source.sign  = signs[ s ];
+			g[ e ].target.index = t;
+			g[ e ].target.sign  = signs[ t ];
+		} else {
+			g[ e ].target.index = s;
+			g[ e ].target.sign  = signs[ s ]*FLIP;
+			g[ e ].source.index = t;
+			g[ e ].source.sign  = signs[ t ]*FLIP;
+		}
+		g[ e ].label = g[ e ].source.sign*g[ e ].target.sign;
+		// the index is used when constructing a backbone tree
+		g[ e ].index = i;
     }
     return g;
 }
@@ -40,38 +45,46 @@ void generate_signs( int *signs, int num_verts ) {
     }
 }
 
-// imposes error on a graph
+// imposes sign and order violations on a graph
 void impose_error( ScaffoldGraph &g, int num_errors ) {
-    int type, s, t,
-        num_verts = num_vertices( g );
-    edge_desc e, e_new;
+    int s, t, num_verts = num_vertices( g );
+    edge_desc e;
     bool b;
+	std::vector<edge_desc> v;
     while( num_errors ) {
         tie( e, b ) = edge( rand()%num_verts, rand()%num_verts, g );
-        if( b ) {
-            type = rand()%3;
-            if( type == 2 ) {
-                g[ e ].s_sign *= NEGATIVE;
-            } else if ( type == 1 ) {
-                g[ e ].t_sign *= NEGATIVE;
-            } else {
-                int temp = g[ e ].s;
-                g[ e ].s = g[ e ].t;
-                g[ e ].t = temp;
-                temp = g[ e ].s_sign;
-                g[ e ].s_sign = g[ e ].t_sign;
-                g[ e ].t_sign = temp;
+        if( b && std::find( v.begin(), v.end(), e) != v.end() ) {
+            switch( rand()%3 ) {
+				// sign violations
+				case 0:
+					g[ e ].source.sign *= FLIP;
+					g[ e ].label *= FLIP;
+					break;
+				case 1:
+					g[ e ].target.sign *= FLIP;
+					g[ e ].label *= FLIP;
+					break;
+				// order violation
+				case 2:
+					int swap_index      = g[ e ].source.index;
+					g[ e ].source.index = g[ e ].target.index;
+					g[ e ].target.index = swap_index;
+					int swap_sign    = g[ e ].source.sign;
+					g[ e ].source.sign  = g[ e ].target.sign;
+					g[ e ].target.sign  = swap_sign;
+					break;
             }
+			v.push_back( e );
             --num_errors;
         }
     }
 }
 
-// generates a simple scaffold graph with error
-ScaffoldGraph generate_simple_synthetic_graph( int num_verts, int num_arcs, int num_errors ) {
-    int signs[ num_verts ];
-    generate_signs( signs, num_verts );
-    ScaffoldGraph g = generate_simple_scaffold_graph( num_verts, num_arcs, signs );
+// generates a scaffold graph with error
+ScaffoldGraph generate_synthetic_graph( int num_verts, int num_arcs, int num_errors ) {
+	int signs[ num_verts ];
+	generate_signs( signs, num_verts );
+    ScaffoldGraph g = generate_scaffold_graph( num_verts, num_arcs, signs );
     impose_error( g, num_errors );
     return g;
 }
