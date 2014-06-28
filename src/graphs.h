@@ -1,3 +1,5 @@
+#ifndef GRAPHS_H
+#define GRAPHS_H
 
 #define POSITIVE 1
 #define NEGATIVE -1
@@ -26,3 +28,4 @@ typedef graph_traits<ScaffoldGraph>::out_edge_iterator out_edge_itr;
 ScaffoldGraph generate_simple_synthetic_graph( int, int, int );
 int highest_degree( const ScaffoldGraph& );
 
+#endif /* GRAPHS_H */
