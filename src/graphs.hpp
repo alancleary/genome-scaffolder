@@ -34,8 +34,6 @@ typedef graph_traits<ScaffoldGraph>::out_edge_iterator out_edge_itr;
 typedef subgraph< adjacency_list<vecS, vecS, directedS, property<vertex_color_t, int>, property<edge_index_t, int> > > DirectedScaffoldGraph;
 typedef graph_traits<DirectedScaffoldGraph>::edge_iterator directed_edge_itr;
 
-//property_map<ScaffoldGraph, int ScaffoldEdge::*>::type weight_property_map = get(&ScaffoldEdge::weight, g);
-
 ScaffoldGraph generate_synthetic_graph( int, int, int );
 int highest_degree( const ScaffoldGraph& );
 ScaffoldGraph generate_bundled_graph( const ScaffoldGraph& );

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "graphs.hpp"
 #include "backbone.hpp"
+#include "error_calculator.hpp"
 
 void parse_command_line_args( int, char*[], int&, int&, int& );
 void usage_quit( char* );
@@ -24,8 +25,10 @@ int main( int argc, char *argv[] ) {
     int root = highest_degree( g );
     int signs[ num_verts ];
     backbone_sign_assignment( g, root, signs );
+	int fas[ num_arcs ];
+	int p = num_sign_violations( g, signs ) + num_order_violations( g, signs, fas );
 
-    // sign enurmoeration with binary tree
+    // sign enurmoeration
 
     // profit!
 }

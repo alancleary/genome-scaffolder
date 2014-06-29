@@ -1,7 +1,6 @@
 
 #include "graphs.hpp"
 #include "feedback_arc_set.hpp"
-#include <ilcplex/ilocplex.h>
 
 // use the macro for STL - enables the application to be run with the Standard Template Library or with other platforms
 ILOSTLBEGIN
