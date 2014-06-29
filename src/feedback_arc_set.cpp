@@ -1,5 +1,6 @@
 
 #include "graphs.hpp"
+#include "feedback_arc_set.hpp"
 #include <ilcplex/ilocplex.h>
 
 // use the macro for STL - enables the application to be run with the Standard Template Library or with other platforms
@@ -17,7 +18,7 @@ typedef property_map<DirectedScaffoldGraph, edge_index_t>::type EdgeIndexMap;
 
 // takes a directed graph and finds a min FAS for it
 template<typename T_in,typename T_out >
-T_out integer_linear_program( DirectedScaffoldGraph g, T_out* fas ) {
+T_out integer_linear_program( const DirectedScaffoldGraph &g, T_out* fas ) {
     // initialize fas
 	int solution_size = -1,
 		num_verts     = num_vertices( g ),
