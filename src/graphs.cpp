@@ -104,3 +104,61 @@ int highest_degree( const ScaffoldGraph &g ) {
     return highest_vertice;
 }
 
+// bundle multiple edges between pairs of nodes
+ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
+	int num_verts = num_vertices( g );
+	ScaffoldGraph bundled( num_verts );
+	// iterate over every pair of nodes
+	out_edge_itr ei, ei_end;
+	int order_vote, sign_vote;
+    edge_desc e;
+    bool b;
+	for( int i = 0; i < num_verts-1; i++ ) {
+		for( int j = i+1; j < num_verts; j++ ) {
+			// iterate over all the edges between the nodes
+			tie( ei, ei_end ) = edge_range( i, j, g );
+			/*
+			if( ei != ei_end ) {
+				order_vote = sign_vote = 0;
+				for( ei; ei != ei_end; ++ei ) {
+					// i will be given a positive sign
+					if( i == g[ *ei ].source.index ) {
+                        if( g[ *ei ].source.sign == POSITIVE ) {
+                            order_vote++;
+                            sign_vote += g[ *ei ].target.sign;
+                        } else {
+                            order_vote--;
+                            sign_vote -= g[ *ei ].target.sign;
+                        }
+					} else {
+                        if( g[ *ei ].target.sign == POSITIVE ) {
+                            order_vote--;
+                            sign_vote += g[ *ei ].target.sign;
+                        } else {
+                            order_vote++;
+                            sign_vote -= g[ *ei ].target.sign;
+                        }
+					}
+				}
+				// add the bundled edge to the new graph
+                tie( e, b ) = add_edge( i, j, bundled );
+                if( order_vote >= 0 ) {
+                    bundled[ e ].source.index = i;
+                    bundled[ e ].source.sign  = POSITIVE;
+                    bundled[ e ].target.index = j;
+                    bundled[ e ].target.sign  = ( ( sign_vote >= 0 ) ? POSITIVE : NEGATIVE );
+                    bundled[ e ].label        = bundled[ e ].target.sign;
+                } else {
+                    bundled[ e ].source.index = j;
+                    bundled[ e ].source.sign  = ( ( sign_vote >= 0 ) ? POSITIVE : NEGATIVE );
+                    bundled[ e ].target.index = 1;
+                    bundled[ e ].target.sign  = POSITIVE;
+                    bundled[ e ].label        = bundled[ e ].source.sign;
+                }
+			}
+		*/
+		}
+	}
+    return bundled;
+}
+

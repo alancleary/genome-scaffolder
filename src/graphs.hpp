@@ -26,7 +26,7 @@ struct ScaffoldEdge {
     int index;
 };
 
-typedef adjacency_list<vecS, vecS, undirectedS, no_property, ScaffoldEdge> ScaffoldGraph;
+typedef adjacency_list<multisetS, vecS, undirectedS, no_property, ScaffoldEdge> ScaffoldGraph;
 typedef graph_traits<ScaffoldGraph>::edge_descriptor edge_desc;
 typedef graph_traits<ScaffoldGraph>::edge_iterator edge_itr;
 typedef graph_traits<ScaffoldGraph>::out_edge_iterator out_edge_itr;
@@ -38,5 +38,6 @@ typedef graph_traits<DirectedScaffoldGraph>::edge_iterator directed_edge_itr;
 
 ScaffoldGraph generate_synthetic_graph( int, int, int );
 int highest_degree( const ScaffoldGraph& );
+ScaffoldGraph generate_bundled_graph( const ScaffoldGraph& );
 
 #endif /* GRAPHS_H */

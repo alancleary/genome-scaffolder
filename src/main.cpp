@@ -16,11 +16,12 @@ int main( int argc, char *argv[] ) {
 
     // generate graph
     ScaffoldGraph g = generate_synthetic_graph( num_verts, num_arcs, num_errors );
-    int root = highest_degree( g );
 
     // edge bundling
+	g = generate_bundled_graph( g );
 
     // backbone tree and start node
+    int root = highest_degree( g );
     int signs[ num_verts ];
     backbone_sign_assignment( g, root, signs );
 
