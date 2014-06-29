@@ -117,7 +117,6 @@ ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
 		for( int j = i+1; j < num_verts; j++ ) {
 			// iterate over all the edges between the nodes
 			tie( ei, ei_end ) = edge_range( i, j, g );
-			/*
 			if( ei != ei_end ) {
 				order_vote = sign_vote = 0;
 				for( ei; ei != ei_end; ++ei ) {
@@ -156,7 +155,6 @@ ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
                     bundled[ e ].label        = bundled[ e ].source.sign;
                 }
 			}
-		*/
 		}
 	}
     return bundled;
