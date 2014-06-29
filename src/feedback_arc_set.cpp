@@ -1,5 +1,5 @@
 
-#include "graphs.h"
+#include "graphs.hpp"
 #include <ilcplex/ilocplex.h>
 
 // use the macro for STL - enables the application to be run with the Standard Template Library or with other platforms

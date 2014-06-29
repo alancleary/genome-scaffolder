@@ -1,6 +1,6 @@
 
-#include "graphs.h"
-#include "backbone.h"
+#include "graphs.hpp"
+#include "backbone.hpp"
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 
 // sets the weight of each edge to be the number of shared neighbors of the edge's vertices

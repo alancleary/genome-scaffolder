@@ -1,5 +1,5 @@
 
-#include "graphs.h"
+#include "graphs.hpp"
 
 // generates a scaffold graph with no errors (an acyclic graph)
 ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] ) {

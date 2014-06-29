@@ -1,8 +1,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "graphs.h"
-#include "backbone.h"
+#include "graphs.hpp"
+#include "backbone.hpp"
 
 void parse_command_line_args( int, char*[], int&, int&, int& );
 void usage_quit( char* );
