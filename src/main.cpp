@@ -21,8 +21,8 @@ int main( int argc, char *argv[] ) {
     // edge bundling
 
     // backbone tree and start node
-    //int signs[ num_verts ];
-    //backbone_sign_assignment( g, root, signs );
+    int signs[ num_verts ];
+    backbone_sign_assignment( g, root, signs );
 
     // sign enurmoeration with binary tree
 

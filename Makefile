@@ -52,14 +52,16 @@ CCFLAGS = $(CCOPT) -I$(CPLEXINCDIR) -I$(CONCERTINCDIR)
 
 all: $(EXBINCPP)/genome-scaffolder
 
-$(EXBINCPP)/genome-scaffolder: $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o
+$(EXBINCPP)/genome-scaffolder: $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/feedback_arc_set.o
 	$(CCC) $(CCFLAGS) $(CCLNDIRS) -o $(EXBINCPP)/genome-scaffolder $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(CCLNFLAGS)
 $(EXBINCPP)/main.o: $(EXSRCCPP)/main.cpp $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o
-	$(CCC) -c $(CCFLAGS) $(EXSRCCPP)/main.cpp -o $(EXBINCPP)/main.o
+	$(CCC) -c $(EXSRCCPP)/main.cpp -o $(EXBINCPP)/main.o
+$(EXBINCPP)/feedback_arc_set.o: $(EXSRCCPP)/feedback_arc_set.cpp $(EXSRCCPP)/feedback_arc_set.h $(EXBINCPP)/graphs.o
+	$(CCC) -c $(CCFLAGS) $(EXSRCCPP)/feedback_arc_set.cpp -o $(EXBINCPP)/feedback_arc_set.o
 $(EXBINCPP)/backbone.o: $(EXSRCCPP)/backbone.cpp $(EXSRCCPP)/backbone.h $(EXBINCPP)/graphs.o
-	$(CCC) -c $(CCFLAGS) $(EXSRCCPP)/backbone.cpp -o $(EXBINCPP)/backbone.o
+	$(CCC) -c $(EXSRCCPP)/backbone.cpp -o $(EXBINCPP)/backbone.o
 $(EXBINCPP)/graphs.o: $(EXSRCCPP)/graphs.cpp $(EXSRCCPP)/graphs.h
-	$(CCC) -c $(CCFLAGS) $(EXSRCCPP)/graphs.cpp -o $(EXBINCPP)/graphs.o
+	$(CCC) -c $(EXSRCCPP)/graphs.cpp -o $(EXBINCPP)/graphs.o
 
 # ------------------------------------------------------------
 
