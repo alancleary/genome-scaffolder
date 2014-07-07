@@ -1,4 +1,4 @@
-SYSTEM     = x86_linux
+SYSTEM     = x86-64_osx
 LIBFORMAT  = static_pic
 
 #------------------------------------------------------------
@@ -10,8 +10,8 @@ LIBFORMAT  = static_pic
 #
 #------------------------------------------------------------
 
-#CPLEXDIR      = ../../..
-#CONCERTDIR    = ../../../../concert
+#CPLEXDIR      = /Users/adamkoziol/Applications/IBM/ILOG/CPLEX_Studio1251/cplex
+#CONCERTDIR    = /Users/adamkoziol/Applications/IBM/ILOG/CPLEX_Studio1251/concert
 
 # ---------------------------------------------------------------------
 # Compiler selection 
