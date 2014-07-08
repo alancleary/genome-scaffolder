@@ -40,8 +40,8 @@ int main( int argc, char *argv[] ) {
 	printf("order violations: %d\n", p2);
 	printf("total violations: %d\n", p);
 
-    // sign enurmoeration
-
+    // sign enumeration
+    
     // profit!
 	puts("profit!");
 }
