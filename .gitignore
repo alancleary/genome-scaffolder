@@ -1,0 +1,14 @@
+
+*.o
+
+genome-scaffolder.xcodeproj/xcuserdata/adamkoziol.xcuserdatad/xcschemes/xcschememanagement.plist
+
+*.xcscheme
+
+genome-scaffolder.xcodeproj/project.xcworkspace/xcuserdata/adamkoziol.xcuserdatad/UserInterfaceState.xcuserstate
+
+genome-scaffolder.xcodeproj/project.xcworkspace/xcshareddata/genome-scaffolder.xccheckout
+
+genome-scaffolder.xcodeproj/project.xcworkspace/contents.xcworkspacedata
+
+genome-scaffolder.xcodeproj/project.pbxproj
