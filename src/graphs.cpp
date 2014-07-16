@@ -1,5 +1,7 @@
 
 #include "graphs.hpp"
+#include <stdlib.h>
+#include <stdio.h>
 
 // generates a scaffold graph with no errors (an acyclic graph)
 ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] ) {
@@ -10,27 +12,20 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
     for( int i = 0; i < num_arcs; i++ ) {
 		// make sure the graph is connected
 		if( i < num_verts ) {
-			s = rand()%i;
-			t = i;
+			s = rand()%(i+1);
+			t = i+1;
 		} else {
 			// in an acyclic ordering the last node is never a source
-			s = i%num_verts-1;
-			// the target needs come after the source in the ordering
+			s = i%(num_verts-1);
+			// the target needs to come after the source in the ordering
 			t = rand()%(num_verts-s)+s+1;
 		}
-		// what's the orientation of the new edge?
+		// add the edge with acyclic ordering
 		tie( e, b ) = add_edge( s, t, g );
-		if( rand()%2 ) {
-			g[ e ].source.index = s;
-			g[ e ].source.sign  = signs[ s ];
-			g[ e ].target.index = t;
-			g[ e ].target.sign  = signs[ t ];
-		} else {
-			g[ e ].target.index = s;
-			g[ e ].target.sign  = signs[ s ]*FLIP;
-			g[ e ].source.index = t;
-			g[ e ].source.sign  = signs[ t ]*FLIP;
-		}
+		g[ e ].source.index = s;
+		g[ e ].source.sign  = signs[ s ];
+		g[ e ].target.index = t;
+		g[ e ].target.sign  = signs[ t ];
 		g[ e ].label = g[ e ].source.sign*g[ e ].target.sign;
 		// the index is used when constructing a backbone tree
 		g[ e ].index = i;
@@ -47,13 +42,13 @@ void generate_signs( int *signs, int num_verts ) {
 
 // imposes sign and order violations on a graph
 void impose_error( ScaffoldGraph &g, int num_errors ) {
-    int s, t, num_verts = num_vertices( g );
+    int num_verts = num_vertices( g );
     edge_desc e;
     bool b;
 	std::vector<edge_desc> v;
-    while( num_errors ) {
+    while( num_errors > 0 ) {
         tie( e, b ) = edge( rand()%num_verts, rand()%num_verts, g );
-        if( b && std::find( v.begin(), v.end(), e) != v.end() ) {
+        if( b && std::find( v.begin(), v.end(), e) == v.end() ) {
             switch( rand()%3 ) {
 				// sign violations
 				case 0:
