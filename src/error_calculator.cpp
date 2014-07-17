@@ -21,6 +21,10 @@ T_out integer_linear_program( const DirectedScaffoldGraph&, T_out* );
 
 // uses a sign assignment to construct a directed graph and solves the FAS
 int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
+	// initialize the fas array
+	for( int i = 0; i < num_edges(g); i++ ) {
+		fas[ i ] = 0;
+	}
 	// make the directed graph
 	int num_verts = num_vertices( g );
 	DirectedScaffoldGraph dg( num_verts );
@@ -65,6 +69,7 @@ int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
 			// add sfas to fas
 			j = 0;
 			for( tie( dei, dei_end ) = edges( sdg ); dei != dei_end; ++dei ) {
+				printf("sfas[ %d ] = %d\n", j, sfas[ j ]);
 				fas[ get( edge_index, sdg, *dei ) ] = sfas[ j++ ];
 			}
 		}
@@ -120,15 +125,15 @@ T_out integer_linear_program( const DirectedScaffoldGraph &g, T_out* fas ) {
         // create the solver object
         IloCplex cplex = IloCplex( model );
         // disable output while solving
-        cplex.setOut( env.getNullStream() );
+        //cplex.setOut( env.getNullStream() );
         // solve the model
         cplex.solve();
         // get the solution
         IloNumArray vals(env);
         cplex.getValues(vals, b); 
-        //cplex.out() << "Solution status " << cplex.getStatus() << endl;
-        //cplex.out() << "Objective value " << cplex.getObjValue() << endl;
-        //cplex.out() << "Solution is: " << vals << endl;
+        cplex.out() << "Solution status " << cplex.getStatus() << endl;
+        cplex.out() << "Objective value " << cplex.getObjValue() << endl;
+        cplex.out() << "Solution is: " << vals << endl;
         // populate the output array
         solution_size = 0;
         for( int k = 0; k < vals.getSize(); k++ ) { 

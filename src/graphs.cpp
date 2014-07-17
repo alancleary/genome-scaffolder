@@ -11,14 +11,14 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
     bool b;
     for( int i = 0; i < num_arcs; i++ ) {
 		// make sure the graph is connected
-		if( i < num_verts ) {
+		if( i < num_verts-1 ) {
 			s = rand()%(i+1);
 			t = i+1;
 		} else {
 			// in an acyclic ordering the last node is never a source
 			s = i%(num_verts-1);
 			// the target needs to come after the source in the ordering
-			t = rand()%(num_verts-s)+s+1;
+			t = rand()%(num_verts-s)+s;
 		}
 		// add the edge with acyclic ordering
 		tie( e, b ) = add_edge( s, t, g );
@@ -35,8 +35,10 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
 
 // generates a list of signs to be assigned to a graph
 void generate_signs( int *signs, int num_verts ) {
+	puts("signs");
     for( int i = 0; i < num_verts; i++ ) {
         signs[ i ] = ( rand()%2 ? POSITIVE : NEGATIVE );
+		printf("signs[ %d ] = %d\n", i, signs[i]);
     }
 }
 
@@ -53,18 +55,18 @@ void impose_error( ScaffoldGraph &g, int num_errors ) {
 				// sign violations
 				case 0:
 					g[ e ].source.sign *= FLIP;
-					g[ e ].label *= FLIP;
+					g[ e ].label	   *= FLIP;
 					break;
 				case 1:
 					g[ e ].target.sign *= FLIP;
-					g[ e ].label *= FLIP;
+					g[ e ].label       *= FLIP;
 					break;
 				// order violation
 				case 2:
 					int swap_index      = g[ e ].source.index;
 					g[ e ].source.index = g[ e ].target.index;
 					g[ e ].target.index = swap_index;
-					int swap_sign    = g[ e ].source.sign;
+					int swap_sign		= g[ e ].source.sign;
 					g[ e ].source.sign  = g[ e ].target.sign;
 					g[ e ].target.sign  = swap_sign;
 					break;
@@ -92,7 +94,7 @@ int highest_degree( const ScaffoldGraph &g ) {
     for( int i = 0; i < num_vertices( g ); i++ ) {
         compare_degree = out_degree( i, g );
         if( compare_degree > highest_degree ) {
-            highest_degree = compare_degree;
+            highest_degree  = compare_degree;
             highest_vertice = i;
         }
     }
