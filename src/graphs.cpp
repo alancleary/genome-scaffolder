@@ -107,7 +107,7 @@ ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
 	ScaffoldGraph bundled( num_verts );
 	// iterate over every pair of nodes
 	out_edge_itr ei, ei_end;
-	int order_vote, sign_vote;
+	int order_vote, sign_vote, index = 0;
     edge_desc e;
     bool b;
 	for( int i = 0; i < num_verts-1; i++ ) {
@@ -151,6 +151,7 @@ ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
                     bundled[ e ].target.sign  = POSITIVE;
                     bundled[ e ].label        = bundled[ e ].source.sign;
                 }
+				bundled[ e ].index = index++;
 			}
 		}
 	}

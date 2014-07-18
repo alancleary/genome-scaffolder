@@ -49,7 +49,7 @@ int main( int argc, char *argv[] ) {
 	for( tie(ei, ei_end) = edges(g); ei != ei_end; ++ei ) {
 		int s = g[ *ei ].source.index,
 			t = g[ *ei ].target.index;
-		printf("(%d)%d -> (%d)%d: %d\n", signs[ s ], s, signs[ t ], t);
+		printf("(%d)%d -> (%d)%d: %d\n", signs[ s ], s, signs[ t ], t, fas[ g[ *ei ].index ]);
 	}
 
     // sign enurmoeration
