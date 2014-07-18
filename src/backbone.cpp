@@ -39,27 +39,6 @@ void assign_neighbor_weights_and_generate_labels( ScaffoldGraph &g, int *labels 
 				vote += neighbors[ g[ *ej ].source.index ] * g[ *ej ].label;
 			}
 		}
-		// iterate all edges incident to the source
-		/*
-        for( tie( s_ei, s_ei_end ) = out_edges( s, g ); s_ei != s_ei_end; ++s_ei ) {
-			// get the neighbor of the source
-            if( g[ *s_ei ].source.index == s ) {
-                n = g[ *s_ei ].target.index;
-            } else {
-                n = g[ *s_ei ].source.index;
-            }
-			// iterate all edges incident to the target
-            for( tie( t_ei, t_ei_end ) = out_edges( t, g ); t_ei != t_ei_end; ++t_ei ) {
-				// if the edge isn't that of s and t and one of the edges is n
-                if( n != t && ( n == g[ *t_ei ].source.index || n == g[ *t_ei ].target.index ) ) { 
-					// add to the neighbor weight of the edge of s and t
-                    g[ *ei ].weight += 1;
-					// vote for equality
-					vote += g[ *s_ei ].label*g[ *t_ei ].label;
-                }
-            }
-		}
-		*/
 		// set the majority label based on the vote
         if( vote > 0 ) {
             labels[ g[ *ei ].index ] = POSITIVE;
@@ -80,10 +59,18 @@ void generate_sign_assignment( const ScaffoldGraph &g, std::vector<edge_desc> ms
 		int i = std::find( mst_edges.begin(), mst_edges.end(), *ei ) - mst_edges.begin();
 		if( i < mst_edges.size() ) {
 			// propagate the sign
-			signs[ g[ *ei ].target.index ] = signs[ root ]*labels[ g[ *ei ].index ];
+			int next,
+				sign = signs[ root ]*labels[ g[ *ei ].index ];
+			if( root == g[ *ei ].source.index ) {
+				next = g[ *ei ].target.index;
+				signs[ g[ *ei ].target.index ] = sign;
+			} else {
+				next = g[ *ei ].source.index;
+				signs[ g[ *ei ].source.index ] = sign;
+			}
 			// recursively call the function
 			mst_edges.erase( mst_edges.begin()+i );
-			generate_sign_assignment( g, mst_edges, labels, ( ( root == g[ *ei ].source.index ) ? g[ *ei ].target.index : g[ *ei ].source.index ), signs );
+			generate_sign_assignment( g, mst_edges, labels, next, signs );
 		}
 	}
 }
@@ -93,16 +80,10 @@ void backbone_sign_assignment( ScaffoldGraph &g, int root, int *signs ) {
 	// assign neighbor weights and majority labels to the graph edges
     int labels[ num_edges( g ) ];
     assign_neighbor_weights_and_generate_labels( g, labels );
-	edge_itr ei, ei_end;
 	// find a minimum spanning tree using the weights
-	puts("mst");
     std::vector<edge_desc> mst_edges;
     property_map<ScaffoldGraph, int ScaffoldEdge::*>::type weight_property_map = get(&ScaffoldEdge::weight, g);
     kruskal_minimum_spanning_tree( g, std::back_inserter( mst_edges ), weight_map( weight_property_map ) );
-	std::vector<edge_desc>::iterator vi;
-	for( vi = mst_edges.begin(); vi != mst_edges.end(); ++vi ) {
-		printf("%d - %d\n", g[ *vi ].source.index, g[ *vi ].target.index);
-	}
 	// propagate signs along the edges using the majority labels
 	signs[ root ] = POSITIVE;
     generate_sign_assignment( g, mst_edges, labels, root, signs );

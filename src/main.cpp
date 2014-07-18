@@ -19,17 +19,10 @@ int main( int argc, char *argv[] ) {
     // generate graph
 	puts("generating scaffold graph");
     ScaffoldGraph g = generate_synthetic_graph( num_verts, num_arcs, num_errors );
-	edge_itr ei, ei_end;
-	for( tie(ei, ei_end) = edges( g ); ei != ei_end; ++ei ) {
-		printf("(%d)%d -(%d)-> (%d)%d\n", g[ *ei ].source.sign, g[ *ei ].source.index, g[ *ei ].label, g[ *ei ].target.sign, g[ *ei ].target.index);
-	}
 
     // edge bundling
 	puts("performing edge bundling");
 	g = generate_bundled_graph( g );
-	for( tie(ei, ei_end) = edges( g ); ei != ei_end; ++ei ) {
-		printf("(%d)%d -(%d)-> (%d)%d\n", g[ *ei ].source.sign, g[ *ei ].source.index, g[ *ei ].label, g[ *ei ].target.sign, g[ *ei ].target.index);
-	}
 
     // backbone tree and start node
 	puts("getting highest degree");
@@ -38,14 +31,12 @@ int main( int argc, char *argv[] ) {
     int signs[ num_verts ];
 	puts("getting the backbone sign assignment");
     backbone_sign_assignment( g, root, signs );
-	for( int i = 0; i < num_verts; i++ ) {
-		printf("(%d)%d\n", signs[i], i);
-	}
 	int fas[ num_arcs ];
 	puts("calculating sign and order violations");
 	int p1 = num_sign_violations( g, signs ),
 		p2 = num_order_violations( g, signs, fas ),
 		p = p1+p2;
+	puts("printing violations");
 	for( tie(ei, ei_end) = edges(g); ei != ei_end; ++ei ) {
 		int s = g[ *ei ].source.index,
 			t = g[ *ei ].target.index;

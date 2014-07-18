@@ -18,7 +18,7 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
 			// in an acyclic ordering the last node is never a source
 			s = i%(num_verts-1);
 			// the target needs to come after the source in the ordering
-			t = rand()%(num_verts-s)+s;
+			t = rand()%(num_verts-(s+1))+s+1;
 		}
 		// add the edge with acyclic ordering
 		tie( e, b ) = add_edge( s, t, g );
@@ -35,10 +35,8 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
 
 // generates a list of signs to be assigned to a graph
 void generate_signs( int *signs, int num_verts ) {
-	puts("signs");
     for( int i = 0; i < num_verts; i++ ) {
         signs[ i ] = ( rand()%2 ? POSITIVE : NEGATIVE );
-		printf("signs[ %d ] = %d\n", i, signs[i]);
     }
 }
 
@@ -147,7 +145,7 @@ ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
                 } else {
                     bundled[ e ].source.index = j;
                     bundled[ e ].source.sign  = ( ( sign_vote >= 0 ) ? POSITIVE : NEGATIVE );
-                    bundled[ e ].target.index = 1;
+                    bundled[ e ].target.index = i;
                     bundled[ e ].target.sign  = POSITIVE;
                     bundled[ e ].label        = bundled[ e ].source.sign;
                 }

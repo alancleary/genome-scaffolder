@@ -68,6 +68,7 @@ int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
 			n += integer_linear_program<IloIntVarArray, int>( sdg, sfas );
 			// add sfas to fas
 			j = 0;
+			puts("printing fas results");
 			for( tie( dei, dei_end ) = edges( sdg ); dei != dei_end; ++dei ) {
 				printf("sfas[ %d ] = %d\n", j, sfas[ j ]);
 				fas[ get( edge_index, sdg, *dei ) ] = sfas[ j++ ];
