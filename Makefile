@@ -17,7 +17,7 @@ LIBFORMAT  = static_pic
 # Compiler selection 
 # ---------------------------------------------------------------------
 
-CCC = g++ -O0 -std=c++11 -ggdb
+CCC = g++ -O0 -std=c++11 -ggdb -Wall
 
 # ---------------------------------------------------------------------
 # Compiler options 
@@ -70,8 +70,8 @@ $(EXBINCPP)/graphs.o: $(EXSRCCPP)/graphs.cpp
 # ------------------------------------------------------------
 
 clean :
-	$(EXBINCPP)/rm -rf *.o
-	$(EXBINCPP)/rm -rf $(CPP_EX)
+	rm -rf $(EXBINCPP)/*.o
+	rm -rf $(EXBINCPP)/$(CPP_EX)
 
 # Local Variables:
 # mode: makefile

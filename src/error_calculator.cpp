@@ -57,20 +57,17 @@ int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
         components[ *vi ].push_back( vi - component_assignments.begin() );
     }
 	// make a subgraph from each component and find a FAS for it
-	int snum_verts, j, n = 0;
+	int j, n = 0;
 	directed_edge_itr dei, dei_end;
 	for( int i = 0; i < num_components; i++ ) {
 		// only components with three or more vertices will have a FAS
-		snum_verts = components[ i ].size();
-		if( snum_verts > 2 ) {
+		if( components[ i ].size() > 2 ) {
 			DirectedScaffoldGraph& sdg = dg.create_subgraph( components[ i ].begin(), components[ i ].end() );
-			int sfas[ snum_verts ];
+			int sfas[ num_edges( g ) ];
 			n += integer_linear_program<IloIntVarArray, int>( sdg, sfas );
 			// add sfas to fas
 			j = 0;
-			puts("printing fas results");
 			for( tie( dei, dei_end ) = edges( sdg ); dei != dei_end; ++dei ) {
-				printf("sfas[ %d ] = %d\n", j, sfas[ j ]);
 				fas[ get( edge_index, sdg, *dei ) ] = sfas[ j++ ];
 			}
 		}
@@ -95,7 +92,7 @@ ILOSTLBEGIN
 template<typename T_in,typename T_out>
 T_out integer_linear_program( const DirectedScaffoldGraph &g, T_out* fas ) {
     // initialize fas
-    int solution_size = -1,
+    int solution_size = 10000000,
         num_verts     = num_vertices( g ),
         num_arcs      = num_edges( g );
     for( int i = 0; i < num_arcs; i++ ) {
@@ -118,7 +115,7 @@ T_out integer_linear_program( const DirectedScaffoldGraph &g, T_out* fas ) {
         // constrain the vertice ordering
         directed_edge_itr ei, ei_end;
 		int i = 0;
-        for( tie( ei, ei_end ) = edges( g ); ei != ei_end; ++ei ) { 
+        for( tie( ei, ei_end ) = edges( g ); ei != ei_end; ++ei ) {
             model.add( ordering[ source( *ei, g ) ]-ordering[ target( *ei, g ) ] >= 1-num_verts*b[ i++ ] );
         }
         // add the objective function
@@ -126,28 +123,28 @@ T_out integer_linear_program( const DirectedScaffoldGraph &g, T_out* fas ) {
         // create the solver object
         IloCplex cplex = IloCplex( model );
         // disable output while solving
-        //cplex.setOut( env.getNullStream() );
+        cplex.setOut( env.getNullStream() );
         // solve the model
         cplex.solve();
-        // get the solution
-        IloNumArray vals(env);
-        cplex.getValues(vals, b); 
-        cplex.out() << "Solution status " << cplex.getStatus() << endl;
-        cplex.out() << "Objective value " << cplex.getObjValue() << endl;
-        cplex.out() << "Solution is: " << vals << endl;
+		// print the results
+        //IloNumArray vals(env);
+        //cplex.getValues(vals, b); 
+        //cplex.out() << "Solution status " << cplex.getStatus() << endl;
+        //cplex.out() << "Objective value " << cplex.getObjValue() << endl;
+        //cplex.out() << "Solution is: " << vals << endl;
         // populate the output array
         solution_size = 0;
-        for( int k = 0; k < vals.getSize(); k++ ) { 
-            if( ( T_out )vals[ k ] ) { 
+        for( int k = 0; k < b.getSize(); k++ ) {
+			fas[ k ] = ( T_out )cplex.getValue( b[ k ] );
+			if( fas[ k ] ) {
                 solution_size++;
             }
-            fas[ k ] = ( T_out )vals[ k ];
         }
 
         //return ( T_out )cplex.getObjValue();
-    } catch( IloException& e ) { 
+    } catch( IloException& e ) {
         //cerr << "Concert exception caught: " << e << endl;
-    } catch( ... ) { 
+    } catch( ... ) {
         //cerr << "Unknown exception caught: " << endl;
     }
     // free the memory that was being used

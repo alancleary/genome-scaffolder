@@ -36,16 +36,14 @@ int main( int argc, char *argv[] ) {
 	int p1 = num_sign_violations( g, signs ),
 		p2 = num_order_violations( g, signs, fas ),
 		p = p1+p2;
-	puts("printing violations");
-	for( tie(ei, ei_end) = edges(g); ei != ei_end; ++ei ) {
-		int s = g[ *ei ].source.index,
-			t = g[ *ei ].target.index;
-		printf("(%d)%d -> (%d)%d: %d\n", signs[ s ], s, signs[ t ], t, fas[ g[ *ei ].index ]);
-	}
+	printf("sign violations: %d\n", p1);
+	printf("order violations: %d\n", p2);
+	printf("total violations: %d\n", p);
 
     // sign enurmoeration
 
     // profit!
+	puts("profit!");
 }
 
 void parse_command_line_args( int argc, char *argv[], int &num_verts, int &num_arcs, int &num_errors ) {
