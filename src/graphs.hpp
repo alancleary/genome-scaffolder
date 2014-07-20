@@ -4,6 +4,8 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/subgraph.hpp>
+#include <vector>
+#include <boost/graph/properties.hpp>
 
 using namespace boost;
 
@@ -30,6 +32,7 @@ typedef adjacency_list<multisetS, vecS, undirectedS, no_property, ScaffoldEdge> 
 typedef graph_traits<ScaffoldGraph>::edge_descriptor edge_desc;
 typedef graph_traits<ScaffoldGraph>::edge_iterator edge_itr;
 typedef graph_traits<ScaffoldGraph>::out_edge_iterator out_edge_itr;
+typedef graph_traits<ScaffoldGraph>::vertex_descriptor Vertex;
 
 typedef subgraph< adjacency_list<vecS, vecS, directedS, property<vertex_color_t, int>, property<edge_index_t, int> > > DirectedScaffoldGraph;
 typedef graph_traits<DirectedScaffoldGraph>::edge_iterator directed_edge_itr;

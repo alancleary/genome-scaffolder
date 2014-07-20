@@ -55,7 +55,7 @@ all: $(EXBINCPP)/genome-scaffolder
 $(EXBINCPP)/genome-scaffolder: $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(EXBINCPP)/sign_enumeration.o
 	$(CCC) $(CCFLAGS) $(CCLNDIRS) -o $(EXBINCPP)/genome-scaffolder $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(EXBINCPP)/sign_enumeration.o $(CCLNFLAGS)
 
-$(EXBINCPP)/main.o: $(EXSRCCPP)/main.cpp $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/sign_enumeration.o
+$(EXBINCPP)/main.o: $(EXSRCCPP)/main.cpp $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o
 	$(CCC) -c $(EXSRCCPP)/main.cpp -o $(EXBINCPP)/main.o
 
 $(EXBINCPP)/error_calculator.o: $(EXSRCCPP)/error_calculator.cpp
