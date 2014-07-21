@@ -18,3 +18,8 @@ Eventually a config file will be added to automate these steps.
 * [CPLEX docs](http://pic.dhe.ibm.com/infocenter/cosinfoc/v12r6/index.jsp)
 * [Google sparsehash](https://code.google.com/p/sparsehash/)
 * [Valgrind](http://valgrind.org/)
+* [SAM specification](http://samtools.github.io/hts-specs/SAMv1.pdf)
+* [Bowtie read mapper](http://bowtie-bio.sourceforge.net/index.shtml)
+* [BWA read mapper](http://bio-bwa.sourceforge.net/)
+* [APG specification](http://www.ncbi.nlm.nih.gov/projects/genome/assembly/agp/AGP_Specification_v2.0.shtml)
+* [GapFiller](http://www.baseclear.com/lab-products/bioinformatics-tools/gapfiller/)
