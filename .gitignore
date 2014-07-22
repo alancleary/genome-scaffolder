@@ -12,3 +12,5 @@
 *.xcscheme
 
 *.plist
+
+Makefile

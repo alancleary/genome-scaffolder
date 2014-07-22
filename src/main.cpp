@@ -4,6 +4,7 @@
 #include "graphs.hpp"
 #include "backbone.hpp"
 #include "error_calculator.hpp"
+#include "sign_enumeration.hpp"
 
 void parse_command_line_args( int, char*[], int&, int&, int& );
 void usage_quit( char* );
@@ -41,7 +42,10 @@ int main( int argc, char *argv[] ) {
 	printf("total violations: %d\n", p);
 
     // sign enumeration
-    
+    //global array to store current optimal sign assignment - initially the backbone
+    int optimal_sign[num_verts];
+    std::copy(signs, signs + num_verts, optimal_sign);
+    sign_enumeration(root, optimal_sign, p, num_verts);//, g);
     // profit!
 	puts("profit!");
 }

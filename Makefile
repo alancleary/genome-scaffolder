@@ -1,4 +1,4 @@
-SYSTEM     = x86-64_osx
+SYSTEM     = x86_linux
 LIBFORMAT  = static_pic
 
 #------------------------------------------------------------
@@ -10,8 +10,8 @@ LIBFORMAT  = static_pic
 #
 #------------------------------------------------------------
 
-#CPLEXDIR      = /Users/adamkoziol/Applications/IBM/ILOG/CPLEX_Studio1251/cplex
-#CONCERTDIR    = /Users/adamkoziol/Applications/IBM/ILOG/CPLEX_Studio1251/concert
+CPLEXDIR      = /home/adam/Downloads/CPLEX/cplex
+CONCERTDIR    = /home/adam/Downloads/CPLEX/concert
 
 # ---------------------------------------------------------------------
 # Compiler selection 
@@ -52,10 +52,10 @@ CCFLAGS = $(CCOPT) -I$(CPLEXINCDIR) -I$(CONCERTINCDIR)
 
 all: $(EXBINCPP)/genome-scaffolder
 
-$(EXBINCPP)/genome-scaffolder: $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o
-	$(CCC) $(CCFLAGS) $(CCLNDIRS) -o $(EXBINCPP)/genome-scaffolder $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(CCLNFLAGS)
+$(EXBINCPP)/genome-scaffolder: $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(EXBINCPP)/sign_enumeration.o
+	$(CCC) $(CCFLAGS) $(CCLNDIRS) -o $(EXBINCPP)/genome-scaffolder $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(EXBINCPP)/sign_enumeration.o $(CCLNFLAGS)
 
-$(EXBINCPP)/main.o: $(EXSRCCPP)/main.cpp $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o
+$(EXBINCPP)/main.o: $(EXSRCCPP)/main.cpp $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/sign_enumeration.o
 	$(CCC) -c $(EXSRCCPP)/main.cpp -o $(EXBINCPP)/main.o
 
 $(EXBINCPP)/error_calculator.o: $(EXSRCCPP)/error_calculator.cpp
@@ -66,6 +66,9 @@ $(EXBINCPP)/backbone.o: $(EXSRCCPP)/backbone.cpp
 
 $(EXBINCPP)/graphs.o: $(EXSRCCPP)/graphs.cpp
 	$(CCC) -c $(EXSRCCPP)/graphs.cpp -o $(EXBINCPP)/graphs.o
+	
+$(EXBINCPP)/sign_enumeration.o: $(EXSRCCPP)/sign_enumeration.cpp
+	$(CCC) -c $(EXSRCCPP)/sign_enumeration.cpp -o $(EXBINCPP)/sign_enumeration.o
 
 # ------------------------------------------------------------
 
