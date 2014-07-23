@@ -44,7 +44,10 @@ int main( int argc, char *argv[] ) {
     // sign enumeration
     //global array to store current optimal sign assignment - initially the backbone
     int optimal_sign[num_verts];
+
     std::copy(signs, signs + num_verts, optimal_sign);
+    puts("copying backbone sign assignment to global array");
+    puts("running sign enumeration");
     sign_enumeration(root, optimal_sign, p, g);
     // profit!
 	puts("profit!");
