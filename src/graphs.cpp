@@ -85,12 +85,13 @@ ScaffoldGraph generate_synthetic_graph( int num_verts, int num_arcs, int num_err
 }
 
 // finds the highest degree vertice in the graph
-int highest_degree( const ScaffoldGraph &g ) {
+int highest_degree( ScaffoldGraph &g ) {
     int highest_degree = 0,
         highest_vertice,
         compare_degree;
     for( int i = 0; i < num_vertices( g ); i++ ) {
         compare_degree = out_degree( i, g );
+		g[ i ].degree = -compare_degree;
         if( compare_degree > highest_degree ) {
             highest_degree  = compare_degree;
             highest_vertice = i;

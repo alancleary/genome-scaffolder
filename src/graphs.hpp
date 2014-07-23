@@ -15,6 +15,11 @@ using namespace boost;
 #define AGREE 1
 #define DISAGREE -1
 
+struct ScaffoldVertex {
+	int degree;
+	default_color_type color;
+};
+
 struct ScaffoldEdgeNode {
 	int index;
 	int sign;
@@ -28,7 +33,7 @@ struct ScaffoldEdge {
     int index;
 };
 
-typedef adjacency_list<multisetS, vecS, undirectedS, no_property, ScaffoldEdge> ScaffoldGraph;
+typedef adjacency_list<multisetS, vecS, undirectedS, ScaffoldVertex, ScaffoldEdge> ScaffoldGraph;
 typedef graph_traits<ScaffoldGraph>::edge_descriptor edge_desc;
 typedef graph_traits<ScaffoldGraph>::edge_iterator edge_itr;
 typedef graph_traits<ScaffoldGraph>::out_edge_iterator out_edge_itr;
@@ -38,7 +43,7 @@ typedef subgraph< adjacency_list<vecS, vecS, directedS, property<vertex_color_t,
 typedef graph_traits<DirectedScaffoldGraph>::edge_iterator directed_edge_itr;
 
 ScaffoldGraph generate_synthetic_graph( int, int, int );
-int highest_degree( const ScaffoldGraph& );
+int highest_degree( ScaffoldGraph& );
 ScaffoldGraph generate_bundled_graph( const ScaffoldGraph& );
 
 #endif /* GRAPHS_H */
