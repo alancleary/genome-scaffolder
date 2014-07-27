@@ -34,6 +34,6 @@ struct node {
 
 
 void sign_enumeration(int, int[], int&, ScaffoldGraph&);
-void explore(node*, int*, int&);
+void explore(node*, int*, int&, node*);
 
 #endif /* SIGN_ENUMERATION_H */
