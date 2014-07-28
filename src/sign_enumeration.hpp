@@ -35,5 +35,6 @@ struct node {
 
 void sign_enumeration(int, int[], int&, ScaffoldGraph&);
 void explore(node*, int*, int&, node*);
+bool find_optimal(node*, node*, int[]);
 
 #endif /* SIGN_ENUMERATION_H */

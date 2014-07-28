@@ -28,12 +28,18 @@ void sign_enumeration(int root, int optimal_sign [], int &p, ScaffoldGraph &g){
     for (int i = 0; i < ordered_contigs.size(); i++){
         printf("index: %d , contig: %d , degree: %d\n", i, ordered_contigs.at(i), g[ordered_contigs.at(i)].degree);
     }
+    puts("\nBackbone sign assignment: ");
+    for (int i = 0; i < ordered_contigs.size(); i++){
+        printf("index: %d , sign: %d\n", i, optimal_sign[i]);
+    }
     //start exploring
     int * depth = 0;
     //pointer to leaf node of current optimal sign assignment path through tree
     node * optimal_leaf = NULL;
     explore(root_node, depth, p, optimal_leaf);
-    //calculate error
+
+    //find optimal sign assignment
+    find_optimal(root_node, optimal_leaf, optimal_sign);
 }
 
 //recursive explorer function.  Takes current node and corresponding index in cuthill-mckee ordering
@@ -92,4 +98,23 @@ void explore (node * current_node, int * depth, int &p, node * optimal_leaf){
     *depth = *depth - 1;
     return;
 
+}
+
+/*
+    Once the binary sign assignment tree has been explored, and an optimal sign
+    enumeration found, this function writes the optimal assignment to the optimal sign array,
+    which is passed back to the main function.
+*/
+bool find_optimal(node * current_node, node * optimal_leaf, int optimal_sign []){
+    if (current_node == NULL){
+        return false;
+    }
+
+    if (current_node == optimal_leaf || find_optimal(current_node->left, optimal_leaf, optimal_sign)
+        || find_optimal(current_node->right, optimal_leaf, optimal_sign)){
+
+        optimal_sign[current_node->contig] = current_node->sign;
+        return true;
+    }
+    return false;
 }
