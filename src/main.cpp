@@ -50,6 +50,9 @@ int main( int argc, char *argv[] ) {
     puts("running sign enumeration");
     sign_enumeration(root, optimal_sign, p, g);
     // profit!
+    for (int i = 0; i < num_verts; i++){
+        printf("node: %d , sign: %d\n", i, optimal_sign[i]);
+    }
 	puts("profit!");
 }
 

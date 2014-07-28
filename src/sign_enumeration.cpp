@@ -16,11 +16,10 @@
 static std::vector<int> ordered_contigs;
 
 //main sign enumeration function
-void sign_enumeration(int root, int optimal_sign [], int &p, ScaffoldGraph &g){
+void sign_enumeration(int root, int optimal_sign [], int p, ScaffoldGraph &g){
     //create root node
-    node r = node(root, POSITIVE);
-    r.error = 0;
-    node * root_node = &r;
+    node * root_node = new node(root, POSITIVE);
+    printf("root node passed to sign enumeration: %d\n", root);
     //reverse-cuthill mckee ordering
     //cuthill_mckee_ordering(g, ordered_contigs.rbegin());//, get(vertex_color, g), make_degree_map(g));
     cuthill_mckee_ordering(g, root, std::back_inserter( ordered_contigs ), get( &ScaffoldVertex::color, g ), get( &ScaffoldVertex::degree, g ) );
@@ -33,52 +32,73 @@ void sign_enumeration(int root, int optimal_sign [], int &p, ScaffoldGraph &g){
         printf("index: %d , sign: %d\n", i, optimal_sign[i]);
     }
     //start exploring
-    int * depth = 0;
+    int depth = 0;
     //pointer to leaf node of current optimal sign assignment path through tree
     node * optimal_leaf = NULL;
-    explore(root_node, depth, p, optimal_leaf);
+    printf("Starting exploration of binary tree at node %d\n", ordered_contigs.at(0));
+    printf("Ordered contigs array size: %d\n", ordered_contigs.size());
+    explore(root_node, &depth, &p, optimal_leaf);
 
     //find optimal sign assignment
+    printf("Reading binary tree for optimal sign assignment.\n");
     find_optimal(root_node, optimal_leaf, optimal_sign);
 }
 
 //recursive explorer function.  Takes current node and corresponding index in cuthill-mckee ordering
-void explore (node * current_node, int * depth, int &p, node * optimal_leaf){
+void explore (node * current_node, int * depth, int *p, node * optimal_leaf){
+    printf("Depth: %d\n", *depth);
+    printf("At node: %d\n", current_node->contig);
+    printf("P value: %d\n", *p);
 	//at internal node
     if (*depth < ordered_contigs.size() - 1){
         //children of current node (originally root) should be vertex with next lower degree
-        node left_child = node(ordered_contigs.at(*depth + 1), NEGATIVE);
-        node right_child = node(ordered_contigs.at(*depth + 1), POSITIVE);
+        node *left_child = new node(ordered_contigs.at(*depth + 1), NEGATIVE);
+        node *right_child = new node(ordered_contigs.at(*depth + 1), POSITIVE);
+    
+        //assign random error (for testing)
+        // left_child->error = rand() % 5;
+        // right_child->error = rand() % 5;
+
         //build tree
-        current_node->left = &left_child;
-        current_node->right = &right_child;
+
+        current_node->left = left_child;
+        current_node->right = right_child;
 
         //compare error (sign + order) to determine which way to explore
-        int left_error, right_error;
+        int left_error = 0; 
+        int right_error = 0;
         /*
             ERROR CALCULATION CODE HERE
         */
+
         //add current node error
         left_error = left_error + current_node->error;
         right_error = right_error + current_node->error;
 
-        left_child.error = left_error;
-        right_child.error = right_error;
+        left_child->error = left_error;
+        right_child->error = right_error;
+
+        printf("Assigned errors: %d %d\n", left_child->error, right_child->error);
+
 
         //explore left then right
-        if(left_error < right_error && left_error <= p){
+        if(left_child->error <= right_child->error && left_child->error <= *p){
+            printf("Going left\n");
             *depth = *depth + 1;
             explore(current_node->left, depth, p, optimal_leaf);
-            if (right_error <= p){
+            if (right_child->error <= *p){
+                printf("Going right\n");
                 *depth = *depth + 1;
                 explore(current_node->right, depth, p, optimal_leaf);
             }
         }
         //explore right then left
-        else if (right_error < left_error && right_error <= p){
+        else if (right_child->error <= left_child->error && right_child->error <= *p){
+            printf("Going right\n");
             *depth = *depth + 1;
             explore(current_node->right, depth, p, optimal_leaf);
-            if (left_error <= p){
+            if (left_child->error <= *p){
+                printf("Going left\n");
                 *depth = *depth + 1;
                 explore(current_node->left, depth, p, optimal_leaf);
             }
@@ -90,12 +110,14 @@ void explore (node * current_node, int * depth, int &p, node * optimal_leaf){
         compute total error for path through tree, update p if new optimal found
         set optimal_leaf pointer to leaf node of optimal sign assignment
     */
-    if (current_node->error < p){
-        p = current_node->error;
+    if (current_node->error < *p){
+        puts("Found better optimal value. Reassigning.");
+        *p = current_node->error;
         optimal_leaf = current_node;
     }
     //subtract 1 from depth counter and return
     *depth = *depth - 1;
+    puts("Reached leaf.  Going up.");
     return;
 
 }
