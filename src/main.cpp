@@ -4,6 +4,7 @@
 #include "graphs.hpp"
 #include "backbone.hpp"
 #include "error_calculator.hpp"
+#include "sign_enumeration.hpp"
 
 void parse_command_line_args( int, char*[], int&, int&, int& );
 void usage_quit( char* );
@@ -41,6 +42,15 @@ int main( int argc, char *argv[] ) {
 	printf("total violations: %d\n", p);
 
     // sign enurmoeration
+	int bound = ( p < 15 ? p : 15 );
+	int optimal_signs[ num_verts ];
+	sign_enumeration( root, optimal_signs, bound, g );
+	if( bound < p ) {
+		printf("found optimal\n");
+	} else {
+		printf("optimal too hard or heuristic was the best\n");
+	}
+	printf("heuristic: %d\nbound: %d\n", p, bound);
 
     // profit!
 	puts("profit!");

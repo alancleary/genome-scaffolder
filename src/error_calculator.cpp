@@ -1,14 +1,53 @@
-
 #include "graphs.hpp"
 #include <boost/graph/strong_components.hpp>
+#include <boost/graph/filtered_graph.hpp>
+#include <typeinfo>
 #include <ilcplex/ilocplex.h>
+
+// filtered undirected scaffold graph
+struct EdgePredicate {
+	ScaffoldGraph local_g;
+    const int *signs;
+    EdgePredicate() { }
+    EdgePredicate( const ScaffoldGraph g, const int *signs ) : local_g( g ) {
+        this->signs = signs;
+	}
+    template <typename Edge>
+    bool operator()( const Edge& e ) const {
+		return signs[ local_g[ e ].source.index ] != 0 && signs[ local_g[ e ].target.index ] != 0;
+	}
+};
+
+struct VertexPredicate {
+    const int *signs;
+    VertexPredicate() { }
+    VertexPredicate( const int *signs ) {
+        this->signs = signs;
+	}
+    template <typename Vertex>
+    bool operator()( const Vertex& v ) const {
+		return signs[ v ] != 0;
+	}
+};
+
+typedef filtered_graph<ScaffoldGraph, EdgePredicate, VertexPredicate> FilteredScaffoldGraph;
+typedef graph_traits<FilteredScaffoldGraph>::edge_iterator filtered_edge_itr;
+
+// creates a filtered graph from a partial sign assignment
+FilteredScaffoldGraph generate_filtered_graph( const ScaffoldGraph &g, const int *signs ) { 
+    EdgePredicate edge_filter( g, signs );
+	VertexPredicate vertex_filter( signs );
+    FilteredScaffoldGraph fg( g, edge_filter, vertex_filter );
+    return fg;
+}
 
 // compares a sign assignment to the edge labels of a graph
 int num_sign_violations( const ScaffoldGraph &g, const int *signs ) {
-	edge_itr ei, ei_end;
+	FilteredScaffoldGraph fg = generate_filtered_graph( g, signs );
+	filtered_edge_itr ei, ei_end;
 	int n = 0;
-	for( tie( ei, ei_end ) = edges( g ); ei != ei_end; ++ei ) {
-		if( g[ *ei ].label != signs[ g[ *ei ].source.index ]*signs[ g[ *ei ].target.index ] ) {
+	for( tie( ei, ei_end ) = edges( fg ); ei != ei_end; ++ei ) {
+		if( fg[ *ei ].label != signs[ fg[ *ei ].source.index ]*signs[ fg[ *ei ].target.index ] ) {
 			n++;
 		}
 	}
@@ -21,21 +60,22 @@ T_out integer_linear_program( const DirectedScaffoldGraph&, T_out* );
 
 // uses a sign assignment to construct a directed graph and solves the FAS
 int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
+	FilteredScaffoldGraph fg = generate_filtered_graph( g, signs );
 	// initialize the fas array
-	for( int i = 0; i < num_edges(g); i++ ) {
+	for( int i = 0; i < num_edges( fg ); i++ ) {
 		fas[ i ] = 0;
 	}
 	// make the directed graph
-	int num_verts = num_vertices( g );
+	int num_verts = num_vertices( fg );
 	DirectedScaffoldGraph dg( num_verts );
 	// add edges to the directed graph
-	edge_itr ei, ei_end;
+	filtered_edge_itr ei, ei_end;
 	int s, s_i, t, t_i;
-	for( tie( ei, ei_end ) = edges( g ); ei != ei_end; ++ei ) {
-		s   = g[ *ei ].source.sign;
-		s_i = g[ *ei ].source.index;
-		t   = g[ *ei ].target.sign;
-		t_i = g[ *ei ].target.index;
+	for( tie( ei, ei_end ) = edges( fg ); ei != ei_end; ++ei ) {
+		s   = fg[ *ei ].source.sign;
+		s_i = fg[ *ei ].source.index;
+		t   = fg[ *ei ].target.sign;
+		t_i = fg[ *ei ].target.index;
 		// if both signs match keep the ordering
 		if( s == signs[ s_i ] && t == signs[ t_i ] ) {
 			add_edge( s_i, t_i, dg );
@@ -63,7 +103,7 @@ int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
 		// only components with three or more vertices will have a FAS
 		if( components[ i ].size() > 2 ) {
 			DirectedScaffoldGraph& sdg = dg.create_subgraph( components[ i ].begin(), components[ i ].end() );
-			int sfas[ num_edges( g ) ];
+			int sfas[ num_edges( fg ) ];
 			n += integer_linear_program<IloIntVarArray, int>( sdg, sfas );
 			// add sfas to fas
 			j = 0;

@@ -17,7 +17,7 @@ LIBFORMAT  = static_pic
 # Compiler selection 
 # ---------------------------------------------------------------------
 
-CCC = g++ -O0 -std=c++11 -ggdb -Wall
+CCC = g++ -O0 -std=c++11 -ggdb
 
 # ---------------------------------------------------------------------
 # Compiler options 
@@ -52,11 +52,14 @@ CCFLAGS = $(CCOPT) -I$(CPLEXINCDIR) -I$(CONCERTINCDIR)
 
 all: $(EXBINCPP)/genome-scaffolder
 
-$(EXBINCPP)/genome-scaffolder: $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o
-	$(CCC) $(CCFLAGS) $(CCLNDIRS) -o $(EXBINCPP)/genome-scaffolder $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(CCLNFLAGS)
+$(EXBINCPP)/genome-scaffolder: $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(EXBINCPP)/sign_enumeration.o
+	$(CCC) $(CCFLAGS) $(CCLNDIRS) -o $(EXBINCPP)/genome-scaffolder $(EXBINCPP)/main.o $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/error_calculator.o $(EXBINCPP)/sign_enumeration.o $(CCLNFLAGS)
 
-$(EXBINCPP)/main.o: $(EXSRCCPP)/main.cpp $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o
+$(EXBINCPP)/main.o: $(EXSRCCPP)/main.cpp $(EXBINCPP)/graphs.o $(EXBINCPP)/backbone.o $(EXBINCPP)/sign_enumeration.o
 	$(CCC) -c $(EXSRCCPP)/main.cpp -o $(EXBINCPP)/main.o
+
+$(EXBINCPP)/sign_enumeration.o: $(EXSRCCPP)/sign_enumeration.cpp
+	$(CCC) -c $(EXSRCCPP)/sign_enumeration.cpp -o $(EXBINCPP)/sign_enumeration.o
 
 $(EXBINCPP)/error_calculator.o: $(EXSRCCPP)/error_calculator.cpp
 	$(CCC) -c $(CCFLAGS) $(EXSRCCPP)/error_calculator.cpp -o $(EXBINCPP)/error_calculator.o

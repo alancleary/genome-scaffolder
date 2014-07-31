@@ -1,4 +1,3 @@
-
 #include "graphs.hpp"
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,7 +26,7 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
 		g[ e ].target.index = t;
 		g[ e ].target.sign  = signs[ t ];
 		g[ e ].label = g[ e ].source.sign*g[ e ].target.sign;
-		// the index is used when constructing a backbone tree
+		// boost doesn't manage edge indexes for us
 		g[ e ].index = i;
     }
     return g;
@@ -156,4 +155,3 @@ ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
 	}
     return bundled;
 }
-

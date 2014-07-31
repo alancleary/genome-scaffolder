@@ -1,6 +1,6 @@
-#ifndef BACKBONE_H
-#define BACKBONE_H
+#ifndef BACKBONE_HPP
+#define BACKBONE_HPP
 
 void backbone_sign_assignment( ScaffoldGraph&, int, int* );
 
-#endif /* BACKBONE_H */
+#endif /* BACKBONE_HPP */
