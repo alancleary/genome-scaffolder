@@ -3,9 +3,11 @@
 #include "error_calculator.hpp"
 #include <boost/graph/properties.hpp>
 #include <boost/graph/cuthill_mckee_ordering.hpp>
+#include <queue>
 
 // stores results of cuthill-mckee
 static std::vector<int> ordered_contigs;
+
 
 // the binary tree
 struct node {
@@ -23,7 +25,17 @@ struct node {
         this->contig = contig;
         this->sign = sign;
     }   
+
+    bool operator< (const node& b) const{
+        return ((p1 + p2) < (b.p1 + b.p2));
+    };
 };
+
+
+
+
+// priority queue to dictate exploration
+static std::priority_queue<node> pq;
 
 // saves the signs along a path into a given array
 void assignment( int *signs, const node *n ) {
