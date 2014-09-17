@@ -1,4 +1,5 @@
-SYSTEM     = x86_linux
+#SYSTEM     = x86_linux
+SYSTEM     = x86-64_linux
 LIBFORMAT  = static_pic
 
 #------------------------------------------------------------
@@ -23,7 +24,8 @@ CCC = g++ -O0 -std=c++11 -ggdb
 # Compiler options 
 # ---------------------------------------------------------------------
 
-CCOPT = -m32 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD
+#CCOPT = -m32 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD
+CCOPT = -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD
 
 # ---------------------------------------------------------------------
 # Link options and libraries
@@ -33,7 +35,8 @@ CPLEXLIBDIR   = $(CPLEXDIR)/lib/$(SYSTEM)/$(LIBFORMAT)
 CONCERTLIBDIR = $(CONCERTDIR)/lib/$(SYSTEM)/$(LIBFORMAT)
 
 CCLNDIRS  = -L$(CPLEXLIBDIR) -L$(CONCERTLIBDIR)
-CCLNFLAGS = -lconcert -lilocplex -lcplex -m32 -lm -lpthread
+#CCLNFLAGS = -lconcert -lilocplex -lcplex -m32 -lm -lpthread
+CCLNFLAGS = -lconcert -lilocplex -lcplex -m64 -lm -lpthread
 
 CONCERTINCDIR = $(CONCERTDIR)/include
 CPLEXINCDIR   = $(CPLEXDIR)/include

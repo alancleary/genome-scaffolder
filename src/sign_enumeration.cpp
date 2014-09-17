@@ -12,9 +12,9 @@ static std::vector<int> ordered_contigs;
 // the binary tree
 struct node {
     int contig; // value representing which contig
-    int sign; // value representing sign assignment (-1 / 1)
-    int p1; // value representing current cumulative error
-    int p2; 
+    int sign; // value representing orientation imposed on contig (-1 / 1)
+    int p1; // cummulative sign violations
+    int p2; // cummulative order violations
     int depth; //current depth in binary tree
     struct node *parent;
     struct node *l_child; // pointer to left child
@@ -22,15 +22,28 @@ struct node {
     node() { };
     //constructor for struct
     node( int contig, int sign, struct node *parent ) { 
-        this->parent = parent;
         this->contig = contig;
         this->sign = sign;
+        this->parent = parent;
+        // implicit depth assignment
+        if( parent != NULL ) {
+            this->depth = parent->depth+1;
+        } else {
+            this->depth = 1;
+        }
     }   
 
+    // used by the priority queue
     bool operator< (const node& b) const{
         return ((p1 + p2) < (b.p1 + b.p2));
     };
+
+    // returns the total error
+    int error() {
+        return p1 + p2;
+    }
 };
+
 
 // priority queue to dictate exploration
 static std::priority_queue<node> pq;
@@ -55,9 +68,7 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
     if( parent->depth < ordered_contigs.size() ) {
         // children of current node (originally root) should be vertex with next lower degree
         node l_child = node( ordered_contigs.at( parent->depth ), NEGATIVE, parent );
-        l_child.depth = parent->depth + 1;
         node r_child = node( ordered_contigs.at( parent->depth ), POSITIVE, parent );
-        r_child.depth = parent->depth + 1;
         // build tree
         parent->l_child = &l_child;
         parent->r_child = &r_child;
@@ -69,9 +80,8 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
 		l_child.p1 = num_sign_violations( g, l_signs );
 		int *l_fas = new int[ num_edges( g ) ];
 		l_child.p2 = num_order_violations( g, l_signs, l_fas );
-		int l_error = l_child.p1 + l_child.p2;
         //add to priority queue if error is less than current optimal
-        if (l_error < p){
+        if ( l_child.error() < p){
             pq.push(l_child);
         }
 		// delete before recursing deeper
@@ -83,28 +93,13 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
 		r_child.p1 = num_sign_violations( g, r_signs );
 		int *r_fas = new int[ num_edges( g ) ];
 		r_child.p2 = num_order_violations( g, r_signs, r_fas );
-		int r_error = r_child.p1 + r_child.p2;
         //add to priority queue if error is less than current optimal
-        if (r_error < p){
+        if ( r_child.error() < p){
             pq.push(r_child);
         }
 		// delete before recursing deeper
 		delete [] r_signs;
 		delete [] r_fas;
-        // explore left then right
-        // if( l_error <= r_error && l_error <= p ){
-        //     explore( parent->l_child, depth+1, p, optimal_assignment, g );
-        //     if( r_error <= p ) {
-        //         explore( parent->r_child, depth+1, p, optimal_assignment, g );
-        //     }
-        // }
-        // // explore right then left
-        // else if( r_error <= l_error && r_error <= p ) {
-        //     explore( parent->r_child, depth+1, p, optimal_assignment, g );
-        //     if( l_error <= p ) {
-        //         explore( parent->l_child, depth+1, p, optimal_assignment, g );
-        //     }
-        // }
 
         // use priority queue to determine next node to explore
         if (!pq.empty()){
@@ -115,8 +110,8 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
         else return;
     }
     // at leaf node
-	else if( parent->p1 + parent->p2 < p ) {
-        p = parent->p1 + parent->p2;
+	else if( parent->error() < p ) {
+        p = parent->error();
         assignment( optimal_assignment, parent );
     }
 }
@@ -127,6 +122,6 @@ void sign_enumeration( int root, int *optimal_assignment, int &p, ScaffoldGraph 
     cuthill_mckee_ordering( g, root, std::back_inserter( ordered_contigs ), get( &ScaffoldVertex::color, g ), get( &ScaffoldVertex::degree, g ) );
     // start exploring
     node n = node( root, POSITIVE, NULL );
-    n.depth = 1;
+    //n.depth = 1;
     explore( &n, p, optimal_assignment, g );
 }
