@@ -100,7 +100,6 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
 		// delete before recursing deeper
 		delete [] r_signs;
 		delete [] r_fas;
-
         // use priority queue to determine next node to explore
         if (!pq.empty()){
             node new_parent = pq.top();

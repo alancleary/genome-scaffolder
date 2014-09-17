@@ -1,23 +1,29 @@
 #include "graphs.hpp"
-#include <stdlib.h>
-#include <stdio.h>
+#include "boost/random.hpp"
+#include "boost/generator_iterator.hpp"
+
+// boost random number generator
+typedef mt19937 Random;
+Random gen( time( 0 ) );
+uniform_int<> dist( 0, std::numeric_limits<int>::max() );
+variate_generator< Random, uniform_int<> > r( gen, dist );
 
 // generates a scaffold graph with no errors (an acyclic graph)
-ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] ) {
-    ScaffoldGraph g( num_verts );
+InitialGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] ) {
+    InitialGraph g( num_verts );
     int s, t;
     edge_desc e;
     bool b;
     for( int i = 0; i < num_arcs; i++ ) {
 		// make sure the graph is connected
 		if( i < num_verts-1 ) {
-			s = rand()%(i+1);
+			s = r()%(i+1);
 			t = i+1;
 		} else {
 			// in an acyclic ordering the last node is never a source
 			s = i%(num_verts-1);
 			// the target needs to come after the source in the ordering
-			t = rand()%(num_verts-(s+1))+s+1;
+			t = r()%(num_verts-(s+1))+s+1;
 		}
 		// add the edge with acyclic ordering
 		tie( e, b ) = add_edge( s, t, g );
@@ -25,9 +31,9 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
 		g[ e ].source.sign  = signs[ s ];
 		g[ e ].target.index = t;
 		g[ e ].target.sign  = signs[ t ];
-		g[ e ].label = g[ e ].source.sign*g[ e ].target.sign;
+		//g[ e ].label = g[ e ].source.sign*g[ e ].target.sign;
 		// boost doesn't manage edge indexes for us
-		g[ e ].index = i;
+		//g[ e ].index = i;
     }
     return g;
 }
@@ -35,28 +41,28 @@ ScaffoldGraph generate_scaffold_graph( int num_verts, int num_arcs, int signs[] 
 // generates a list of signs to be assigned to a graph
 void generate_signs( int *signs, int num_verts ) {
     for( int i = 0; i < num_verts; i++ ) {
-        signs[ i ] = ( rand()%2 ? POSITIVE : NEGATIVE );
+        signs[ i ] = ( r()%2 ? POSITIVE : NEGATIVE );
     }
 }
 
 // imposes sign and order violations on a graph
-void impose_error( ScaffoldGraph &g, int num_errors ) {
+void impose_error( InitialGraph &g, int num_errors ) {
     int num_verts = num_vertices( g );
-    edge_desc e;
+    initial_edge_desc e;
     bool b;
-	std::vector<edge_desc> v;
+	std::vector<initial_edge_desc> v;
     while( num_errors > 0 ) {
-        tie( e, b ) = edge( rand()%num_verts, rand()%num_verts, g );
+        tie( e, b ) = edge( r()%num_verts, r()%num_verts, g );
         if( b && std::find( v.begin(), v.end(), e) == v.end() ) {
-            switch( rand()%3 ) {
+            switch( r()%3 ) {
 				// sign violations
 				case 0:
 					g[ e ].source.sign *= FLIP;
-					g[ e ].label	   *= FLIP;
+					//g[ e ].label	   *= FLIP;
 					break;
 				case 1:
 					g[ e ].target.sign *= FLIP;
-					g[ e ].label       *= FLIP;
+					//g[ e ].label       *= FLIP;
 					break;
 				// order violation
 				case 2:
@@ -75,15 +81,32 @@ void impose_error( ScaffoldGraph &g, int num_errors ) {
 }
 
 // generates a scaffold graph with error
-ScaffoldGraph generate_synthetic_graph( int num_verts, int num_arcs, int num_errors ) {
+InitialGraph generate_synthetic_graph( int num_verts, int num_arcs, int num_errors ) {
 	int signs[ num_verts ];
 	generate_signs( signs, num_verts );
-    ScaffoldGraph g = generate_scaffold_graph( num_verts, num_arcs, signs );
+    InitialGraph g = generate_scaffold_graph( num_verts, num_arcs, signs );
     impose_error( g, num_errors );
     return g;
 }
 
 // finds the highest degree vertice in the graph
+int highest_degree( ScaffoldGraph &g ) {
+    vertex_indices indices = get( vertex_index, g );
+    int highest_degree = 0,
+        highest_vertice,
+        compare_degree;
+    vertex_itr vi, vi_end;
+    for( tie( vi, vi_end ) = vertices( g ); vi != vi_end; ++vi ) {
+        compare_degree = out_degree( *vi, g );
+        g[ *vi ].degree = -compare_degree;
+        if( compare_degree > highest_degree ) {
+            highest_degree = compare_degree;
+            highest_vertice = indices[ *vi ];
+        }
+    }
+    return highest_vertice;
+}
+/*
 int highest_degree( ScaffoldGraph &g ) {
     int highest_degree = 0,
         highest_vertice,
@@ -98,13 +121,14 @@ int highest_degree( ScaffoldGraph &g ) {
     }
     return highest_vertice;
 }
+*/
 
 // bundle multiple edges between pairs of nodes
-ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
+ScaffoldGraph generate_bundled_graph( const InitialGraph &g ) {
 	int num_verts = num_vertices( g );
 	ScaffoldGraph bundled( num_verts );
 	// iterate over every pair of nodes
-	out_edge_itr ei, ei_end;
+	initial_out_edge_itr ei, ei_end;
 	int order_vote, sign_vote, index = 0;
     edge_desc e;
     bool b;
@@ -149,7 +173,7 @@ ScaffoldGraph generate_bundled_graph( const ScaffoldGraph &g ) {
                     bundled[ e ].target.sign  = POSITIVE;
                     bundled[ e ].label        = bundled[ e ].source.sign;
                 }
-				bundled[ e ].index = index++;
+				//bundled[ e ].index = index++;
 			}
 		}
 	}

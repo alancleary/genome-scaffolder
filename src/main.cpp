@@ -19,11 +19,11 @@ int main( int argc, char *argv[] ) {
 
     // generate graph
 	puts("generating scaffold graph");
-    ScaffoldGraph g = generate_synthetic_graph( num_verts, num_arcs, num_errors );
+    InitialGraph ig = generate_synthetic_graph( num_verts, num_arcs, num_errors );
 
     // edge bundling
 	puts("performing edge bundling");
-	g = generate_bundled_graph( g );
+	ScaffoldGraph g = generate_bundled_graph( ig );
 
     // backbone tree and start node
 	puts("getting highest degree");
