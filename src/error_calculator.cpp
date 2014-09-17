@@ -54,6 +54,46 @@ int num_sign_violations( const ScaffoldGraph &g, const int *signs ) {
 	return n;
 }
 
+// a fast and effective heuristic for the feedback arc set problem (1993)
+int approximate_fas( const DirectedScaffoldGraph &g, int* fas ) {
+    // make a vector to "hold" the vertices of the graph
+	std::vector<int> vertices;
+    for( int i = 0; i < num_vertices( g ); i++ ) {
+        vertices.push_back( i );
+    }
+    // a vector to hold sinks
+	std::vector<int> sinks;
+    // a vector to hold sources
+	std::vector<int> sources;
+    // a vector to hold removed sinks
+    std::vector<int> removed_sinks;
+    // a vector to hold removed sources
+    std::vector<int> removed_sources;
+    // populate the vertices, sinks, and sources vectors
+
+    // run the heuristic
+    while( !vertices.empty() ) {
+        while( !sinks.empty() ) {
+            //choose a sink (at the time of removal) u
+            //removed_sinks.push_back( u )
+            //G.remove( u )
+        }
+        while( !sources.empty() ) {
+            //choose a source (at the time of removal) u
+            //removed_sources.push_back( u )
+            //G.remove( u )
+        }
+        if( !vertices.empty() ) {
+            //choose a vertex u for which delta( u ) (outdegree - indegree) is a maximum
+            //s1.append( u )// the paper contradicts itself
+            //G.remove( u )
+        }
+    }
+    //combine to make ordered list by concatinating sinks to sources
+    //the sequence induces a FAS on the graph
+    return -1;
+}
+
 // function prototype
 template<typename T_in,typename T_out>
 T_out integer_linear_program( const DirectedScaffoldGraph&, T_out* );
@@ -105,6 +145,7 @@ int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
 			DirectedScaffoldGraph& sdg = dg.create_subgraph( components[ i ].begin(), components[ i ].end() );
 			int sfas[ num_edges( fg ) ];
 			n += integer_linear_program<IloIntVarArray, int>( sdg, sfas );
+            //n += approximate_fas( sdg, sfas );
 			// add sfas to fas
 			j = 0;
 			for( tie( dei, dei_end ) = edges( sdg ); dei != dei_end; ++dei ) {
