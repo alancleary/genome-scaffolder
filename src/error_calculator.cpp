@@ -3,6 +3,7 @@
 #include <boost/graph/filtered_graph.hpp>
 #include <typeinfo>
 #include <ilcplex/ilocplex.h>
+#include <boost/graph/copy.hpp>
 
 // filtered undirected scaffold graph
 struct EdgePredicate {
@@ -56,40 +57,38 @@ int num_sign_violations( const ScaffoldGraph &g, const int *signs ) {
 
 // a fast and effective heuristic for the feedback arc set problem (1993)
 int approximate_fas( const DirectedScaffoldGraph &g, int* fas ) {
-    // make a vector to "hold" the vertices of the graph
-	std::vector<int> vertices;
-    for( int i = 0; i < num_vertices( g ); i++ ) {
-        vertices.push_back( i );
-    }
+    // make a copy of the graph we can destroy
+    DirectedScaffoldGraph clone;
+    copy_graph( g, clone );
     // a vector to hold sinks
 	std::vector<int> sinks;
     // a vector to hold sources
 	std::vector<int> sources;
-    // a vector to hold removed sinks
-    std::vector<int> removed_sinks;
-    // a vector to hold removed sources
-    std::vector<int> removed_sources;
-    // populate the vertices, sinks, and sources vectors
 
     // run the heuristic
-    while( !vertices.empty() ) {
+    while( num_vertices( clone ) > 0 ) {
+        // at each iteration find all sinks and sources and remove them
         while( !sinks.empty() ) {
-            //choose a sink (at the time of removal) u
-            //removed_sinks.push_back( u )
+            //choose a sink u
+            //sinks.push_back( u )
             //G.remove( u )
         }
         while( !sources.empty() ) {
-            //choose a source (at the time of removal) u
-            //removed_sources.push_back( u )
+            //choose a source u
+            //sources.push_back( u )
             //G.remove( u )
         }
-        if( !vertices.empty() ) {
+        if( num_vertices( clone ) > 0 ) {
             //choose a vertex u for which delta( u ) (outdegree - indegree) is a maximum
-            //s1.append( u )// the paper contradicts itself
+            //sources.append( u )// the paper contradicts itself
             //G.remove( u )
         }
     }
-    //combine to make ordered list by concatinating sinks to sources
+    // concatinate sources and sinks to make and ordered list
+    std::vector<int> ordering;
+    ordering.reserve( sources.size() + sinks.size() ); // preallocate memory
+    ordering.insert( ordering.end(), sources.begin(), sources.end() );
+    ordering.insert( ordering.end(), sinks.begin(), sinks.end() );
     //the sequence induces a FAS on the graph
     return -1;
 }
