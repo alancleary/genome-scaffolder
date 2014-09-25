@@ -44,7 +44,8 @@ int main( int argc, char *argv[] ) {
     // sign enurmoeration
 	int bound = ( p < 15 ? p : 15 );
 	int optimal_signs[ num_verts ];
-	sign_enumeration( root, optimal_signs, bound, g );
+	//sign_enumeration( root, optimal_signs, bound, g );
+    solve_scaffold( root, optimal_signs, bound, g );
 	if( bound < p ) {
 		printf("found optimal\n");
 	} else {

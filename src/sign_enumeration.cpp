@@ -116,6 +116,7 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
 }
 
 // main sign enumeration function
+/*
 void sign_enumeration( int root, int *optimal_assignment, int &p, ScaffoldGraph &g ) {
     // reverse-cuthill mckee ordering
     cuthill_mckee_ordering( g, root, std::back_inserter( ordered_contigs ), get( &ScaffoldVertex::color, g ), get( &ScaffoldVertex::degree, g ) );
@@ -123,4 +124,37 @@ void sign_enumeration( int root, int *optimal_assignment, int &p, ScaffoldGraph 
     node n = node( root, POSITIVE, NULL );
     //n.depth = 1;
     explore( &n, p, optimal_assignment, g );
+}
+*/
+
+// main sign enumeration function
+void solve_scaffold( int root, int *optimal_assignment, int &p, ScaffoldGraph &g ) {
+    // reverse-cuthill mckee ordering
+    std::vector<int> global_order;
+    cuthill_mckee_ordering( g, root, std::back_inserter( global_order ), get( &ScaffoldVertex::color, g ), get( &ScaffoldVertex::degree, g ) );
+    // root the gloabl sign assignment tree
+    node global_root = node( root, POSITIVE, NULL );
+    // the node each subgraph iteration will begin on
+    node local_root = global_root;
+    // select subsets of nodes from ordered_contigs and solve their subgraphs
+    std::vector<int>::iterator it = ordered_contigs.begin();
+    while( it != ordered_contigs.end() ) {
+        puts("subset");
+        // make the subgraph
+        std::vector<int> subset;
+        std::vector<int>::iterator local_it = it;
+        for( int i = 0; i < 20 && it != ordered_contigs.end(); i++ ) {
+            subset.push_back( *it );
+            ordered_contigs.push_back( *it );
+            ++it;
+        }
+        //SubScaffoldGraph& sg = g.create_subgraph( subgraph.begin(), subgraph.end() );
+        // solve the subgraph
+        explore( &local_root, p, optimal_assignment, g );
+        // add the solved contigs to the global tree
+        for( int i = 0; i < 20 && local_it != ordered_contigs.end(); i++ ) {
+            local_root = node( *local_it, optimal_assignment[ *local_it ], &local_root );
+            ++local_it;
+        }
+    }
 }
