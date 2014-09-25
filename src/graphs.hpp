@@ -56,6 +56,7 @@ typedef subgraph<ScaffoldGraph> SubScaffoldGraph;
 // directed scaffold graph
 typedef subgraph< adjacency_list<vecS, vecS, directedS, property<vertex_color_t, int>, property<edge_index_t, int> > > DirectedScaffoldGraph;
 typedef graph_traits<DirectedScaffoldGraph>::edge_iterator directed_edge_itr;
+typedef property_map<DirectedScaffoldGraph, vertex_color_t>::type vertex_color_map;
 
 // graph functions
 InitialGraph generate_synthetic_graph( int, int, int );

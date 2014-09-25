@@ -56,6 +56,7 @@ int num_sign_violations( const ScaffoldGraph &g, const int *signs ) {
 }
 
 // a fast and effective heuristic for the feedback arc set problem (1993)
+/*
 int approximate_fas( const DirectedScaffoldGraph &g, int* fas ) {
     // make a copy of the graph we can destroy
     DirectedScaffoldGraph clone;
@@ -67,23 +68,36 @@ int approximate_fas( const DirectedScaffoldGraph &g, int* fas ) {
 
     // run the heuristic
     while( num_vertices( clone ) > 0 ) {
-        // at each iteration find all sinks and sources and remove them
-        while( !sinks.empty() ) {
-            //choose a sink u
-            //sinks.push_back( u )
-            //G.remove( u )
+        std::vector<int> remove;
+        // find all sinks and sources
+        for( int i = 0; i < num_vertices( clone ); i++ ) {
+            if( in_degree( i, clone ) > 0 && out_degree( i, clone ) == 0 ) {
+                sinks.push_back( i );
+                remove.push_back( i );
+            } else if( in_degree( i, clone ) == 0 && out_degree( i, clone ) > 0 ) {
+                sources.push_back( i );
+                remove.push_back( i );
+            }
         }
-        while( !sources.empty() ) {
-            //choose a source u
-            //sources.push_back( u )
-            //G.remove( u )
-        }
+        // sort the list of vertices to be removed so reindexing doesn't throw us off
         if( num_vertices( clone ) > 0 ) {
-            //choose a vertex u for which delta( u ) (outdegree - indegree) is a maximum
-            //sources.append( u )// the paper contradicts itself
-            //G.remove( u )
+            // choose a vertex u for which delta( u ) (outdegree - indegree) is a maximum
+            int max_delta = 0;
+            int max_vertex;
+            for( int i = 0; i < num_vertices( clone ); i++ ) {
+                int degree = out_degree( i, clone ) - in_degree( i, clone );
+                if( degree > max_delta ) {
+                    max_delta = degree;
+                    max_vertex = i;
+                }
+            }
+            // add the vertex to the ordering
+            sources.push_back( max_vertex );
+            // remove the vertex from the graph
+            remove_vertex( max_vertex, clone );
         }
     }
+
     // concatinate sources and sinks to make and ordered list
     std::vector<int> ordering;
     ordering.reserve( sources.size() + sinks.size() ); // preallocate memory
@@ -92,6 +106,7 @@ int approximate_fas( const DirectedScaffoldGraph &g, int* fas ) {
     //the sequence induces a FAS on the graph
     return -1;
 }
+*/
 
 // function prototype
 template<typename T_in,typename T_out>
