@@ -45,8 +45,6 @@ struct node {
 };
 
 
-// priority queue to dictate exploration
-static std::priority_queue<node> pq;
 
 // saves the signs along a path into a given array
 void assignment( int *signs, const node *n ) {
@@ -63,7 +61,7 @@ void save_assignment( int *signs, int num_verts, const node *n ) {
 }
 
 // recursive explorer function. Takes current node and corresponding index in cuthill-mckee ordering
-void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph &g ) {
+void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph &g, std::priority_queue<node> &pq ) {
     // at internal node
     if( parent->depth < ordered_contigs.size() ) {
         // children of current node (originally root) should be vertex with next lower degree
@@ -73,7 +71,8 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
         parent->l_child = &l_child;
         parent->r_child = &r_child;
         // calculate each child's error using filtered graphs
-		int num_verts = ordered_contigs.size();
+		//int num_verts = ordered_contigs.size();
+        int num_verts = num_vertices( g );
 		// compute the left child's error
 		int *l_signs = new int[ num_verts ];
 		save_assignment( l_signs, num_verts, &l_child );
@@ -104,7 +103,7 @@ void explore( node *parent, int &p, int *optimal_assignment, const ScaffoldGraph
         if (!pq.empty()){
             node new_parent = pq.top();
             pq.pop();
-            explore(&new_parent, p, optimal_assignment, g);
+            explore(&new_parent, p, optimal_assignment, g, pq);
         }
         else return;
     }
@@ -133,27 +132,32 @@ void solve_scaffold( int root, int *optimal_assignment, int &p, ScaffoldGraph &g
     std::vector<int> global_order;
     cuthill_mckee_ordering( g, root, std::back_inserter( global_order ), get( &ScaffoldVertex::color, g ), get( &ScaffoldVertex::degree, g ) );
     // root the gloabl sign assignment tree
-    node global_root = node( root, POSITIVE, NULL );
+    node *global_root = new node( root, POSITIVE, NULL );
     // the node each subgraph iteration will begin on
-    node local_root = global_root;
+    node *local_root = global_root;
     // select subsets of nodes from ordered_contigs and solve their subgraphs
-    std::vector<int>::iterator it = ordered_contigs.begin();
-    while( it != ordered_contigs.end() ) {
-        puts("subset");
+    //std::vector<int>::iterator it = ordered_contigs.begin();
+    std::vector<int>::iterator it = global_order.begin();
+    //while( it != ordered_contigs.end() ) {
+    while( it != global_order.end() ) {
         // make the subgraph
-        std::vector<int> subset;
+        //std::vector<int> subset;
         std::vector<int>::iterator local_it = it;
-        for( int i = 0; i < 20 && it != ordered_contigs.end(); i++ ) {
-            subset.push_back( *it );
+        //for( int i = 0; i < 20 && it != ordered_contigs.end(); i++ ) {
+        for( int i = 0; i < 20 && it != global_order.end(); i++ ) {
+            //subset.push_back( *it );
             ordered_contigs.push_back( *it );
             ++it;
         }
         //SubScaffoldGraph& sg = g.create_subgraph( subgraph.begin(), subgraph.end() );
         // solve the subgraph
-        explore( &local_root, p, optimal_assignment, g );
+        // priority queue to dictate exploration
+        std::priority_queue<node> pq;
+        explore( local_root, p, optimal_assignment, g, pq );
         // add the solved contigs to the global tree
-        for( int i = 0; i < 20 && local_it != ordered_contigs.end(); i++ ) {
-            local_root = node( *local_it, optimal_assignment[ *local_it ], &local_root );
+        //for( int i = 0; i < 20 && local_it != ordered_contigs.end(); i++ ) {
+        for( int i = 0; i < 20 && local_it != global_order.end(); i++ ) {
+            local_root = new node( *local_it, optimal_assignment[ *local_it ], local_root );
             ++local_it;
         }
     }
