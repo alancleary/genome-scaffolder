@@ -54,7 +54,7 @@ typedef property_map<ScaffoldGraph, edge_index_t>::type edge_index_map;
 typedef subgraph<ScaffoldGraph> SubScaffoldGraph;
 
 // directed scaffold graph
-typedef subgraph< adjacency_list<vecS, vecS, directedS, property<vertex_color_t, int>, property<edge_index_t, int> > > DirectedScaffoldGraph;
+typedef subgraph< adjacency_list<vecS, vecS, bidirectionalS, property<vertex_color_t, int>, property<edge_index_t, int> > > DirectedScaffoldGraph;
 typedef graph_traits<DirectedScaffoldGraph>::edge_iterator directed_edge_itr;
 typedef graph_traits<DirectedScaffoldGraph>::vertex_iterator directed_vertex_itr;
 typedef property_map<DirectedScaffoldGraph, vertex_color_t>::type vertex_color_map;
