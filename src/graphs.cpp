@@ -1,6 +1,7 @@
 #include "graphs.hpp"
 #include "boost/random.hpp"
 #include "boost/generator_iterator.hpp"
+#include <boost/graph/graph_utility.hpp>
 
 // boost random number generator
 typedef mt19937 Random;
@@ -178,4 +179,9 @@ ScaffoldGraph generate_bundled_graph( const InitialGraph &g ) {
 		}
 	}
     return bundled;
+}
+
+void print(ScaffoldGraph &g){
+    print_graph(g);
+    puts("");
 }

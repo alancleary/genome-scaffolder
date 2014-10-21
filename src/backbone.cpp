@@ -82,6 +82,16 @@ void generate_sign_assignment( ScaffoldGraph &g, std::vector<edge_desc> mst_edge
 	}
 }
 
+void print_sign_assignment(ScaffoldGraph &g, int *signs){
+	int length = num_vertices(g);
+	puts("Printing backbone sign assignment...");
+	for(int i = 0; i < length; i++){
+		printf("contig: %d, sign: %d\n", i, signs[i]);
+	}
+	puts("");
+}
+
+
 // constructs spanning tree from majority weights and makes sign assignment with spanning tree majority labels
 void backbone_sign_assignment( ScaffoldGraph &g, int root, int *signs ) {
 	// assign neighbor weights and majority labels to the graph edges
@@ -94,4 +104,7 @@ void backbone_sign_assignment( ScaffoldGraph &g, int root, int *signs ) {
 	// propagate signs along the edges using the majority labels
 	signs[ root ] = POSITIVE;
     generate_sign_assignment( g, mst_edges, labels, root, signs );
+    print_sign_assignment(g, signs);
 }
+
+

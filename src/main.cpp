@@ -25,6 +25,11 @@ int main( int argc, char *argv[] ) {
 	puts("performing edge bundling");
 	ScaffoldGraph g = generate_bundled_graph( ig );
 
+    //print scaffold graph
+    puts("printing graph");
+    print(g);
+   
+
     // backbone tree and start node
 	puts("getting highest degree");
     int root = highest_degree( g );
@@ -33,6 +38,7 @@ int main( int argc, char *argv[] ) {
 	puts("getting the backbone sign assignment");
     backbone_sign_assignment( g, root, signs );
 	int fas[ num_arcs ];
+	
 	puts("calculating sign and order violations");
 	int p1 = num_sign_violations( g, signs ),
 		p2 = num_order_violations( g, signs, fas ),
@@ -41,7 +47,8 @@ int main( int argc, char *argv[] ) {
 	printf("order violations: %d\n", p2);
 	printf("total violations: %d\n", p);
 
-    // sign enurmoeration
+	
+    // sign enumeration
 	int bound = ( p < 15 ? p : 15 );
 	int optimal_signs[ num_verts ];
 	//sign_enumeration( root, optimal_signs, bound, g );

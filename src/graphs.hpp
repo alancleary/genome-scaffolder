@@ -49,7 +49,6 @@ typedef graph_traits<ScaffoldGraph>::out_edge_iterator out_edge_itr;
 typedef graph_traits<ScaffoldGraph>::vertex_iterator vertex_itr;
 typedef property_map<ScaffoldGraph, vertex_index_t>::type vertex_indices;
 typedef property_map<ScaffoldGraph, edge_index_t>::type edge_index_map;
-
 // subundirected graph
 typedef subgraph<ScaffoldGraph> SubScaffoldGraph;
 
@@ -63,5 +62,6 @@ typedef property_map<DirectedScaffoldGraph, vertex_color_t>::type vertex_color_m
 InitialGraph generate_synthetic_graph( int, int, int );
 int highest_degree( ScaffoldGraph& );
 ScaffoldGraph generate_bundled_graph( const InitialGraph& );
+void print(ScaffoldGraph&);
 
 #endif /* GRAPHS_HPP */
