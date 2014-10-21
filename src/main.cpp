@@ -26,17 +26,19 @@ int main( int argc, char *argv[] ) {
 	ScaffoldGraph g = generate_bundled_graph( ig );
 
     //print scaffold graph
-    puts("printing graph");
     print(g);
    
 
+    puts("\nBackbone construction and error calculation");
+    puts("--------------------------------------------");
     // backbone tree and start node
-	puts("getting highest degree");
+	//puts("getting highest degree");
     int root = highest_degree( g );
-	printf("%d\n", root);
+	printf("highest degree contig: %d\n", root);
     int signs[ num_verts ];
 	puts("getting the backbone sign assignment");
     backbone_sign_assignment( g, root, signs );
+    print_sign_assignment(g, signs);
 	int fas[ num_arcs ];
 	
 	puts("calculating sign and order violations");
@@ -49,12 +51,18 @@ int main( int argc, char *argv[] ) {
 
 	
     // sign enumeration
+    puts("\nSign enumeration");
+    puts("----------------");
 	int bound = ( p < 15 ? p : 15 );
 	int optimal_signs[ num_verts ];
 	//sign_enumeration( root, optimal_signs, bound, g );
     solve_scaffold( root, optimal_signs, bound, g );
+
+    puts("\nResults");
+    puts("-------");
 	if( bound < p ) {
 		printf("found optimal\n");
+        print_optimal(optimal_signs, num_verts);
 	} else {
 		printf("optimal too hard or heuristic was the best\n");
 	}

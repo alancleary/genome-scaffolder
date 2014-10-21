@@ -126,12 +126,24 @@ void sign_enumeration( int root, int *optimal_assignment, int &p, ScaffoldGraph 
 }
 */
 
+//prints cuthill_mckee ordering
+void print_cuthill(std::vector<int> &global_order){
+    printf("\nCuthill-Mckee: ");
+    std::vector<int>::iterator it = global_order.begin();
+    while(it != global_order.end()){
+        printf("%d ", *it);
+        ++it;
+    }
+    puts("");
+}
+
 // main sign enumeration function
 void solve_scaffold( int root, int *optimal_assignment, int &p, ScaffoldGraph &g ) {
     // reverse-cuthill mckee ordering
     std::vector<int> global_order;
     cuthill_mckee_ordering( g, root, std::back_inserter( global_order ), get( &ScaffoldVertex::color, g ), get( &ScaffoldVertex::degree, g ) );
-    // root the gloabl sign assignment tree
+    print_cuthill(global_order);
+    // root the global sign assignment tree
     node *global_root = new node( root, POSITIVE, NULL );
     // the node each subgraph iteration will begin on
     node *local_root = global_root;
@@ -150,6 +162,15 @@ void solve_scaffold( int root, int *optimal_assignment, int &p, ScaffoldGraph &g
             ++it;
         }
         //SubScaffoldGraph& sg = g.create_subgraph( subgraph.begin(), subgraph.end() );
+
+        // print the subgraph
+        std::vector<int>::iterator oc_iterator = ordered_contigs.begin();
+        printf("Performing explore for contigs: ");
+        while(oc_iterator != ordered_contigs.end()){
+            printf("%d ", *oc_iterator);
+            ++oc_iterator;
+        }
+        printf("\n");
         // solve the subgraph
         // priority queue to dictate exploration
         std::priority_queue<node> pq;
@@ -160,5 +181,13 @@ void solve_scaffold( int root, int *optimal_assignment, int &p, ScaffoldGraph &g
             local_root = new node( *local_it, optimal_assignment[ *local_it ], local_root );
             ++local_it;
         }
+    }
+}
+
+//prints optimal sign assignment found after sign enumeration steps
+void print_optimal(int *optimal_assignment, int num_verts){
+    puts("Optimal sign assignment");
+    for(int i = 0; i < num_verts; i++){
+        printf("contig: %d, sign: %d\n", i, optimal_assignment[i]);
     }
 }

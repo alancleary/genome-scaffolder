@@ -181,7 +181,10 @@ ScaffoldGraph generate_bundled_graph( const InitialGraph &g ) {
     return bundled;
 }
 
+//prints the Scaffold Graph
 void print(ScaffoldGraph &g){
+    puts("\nprinting graph");
+    puts("---------------");
     print_graph(g);
     puts("");
 }

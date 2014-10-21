@@ -82,6 +82,7 @@ void generate_sign_assignment( ScaffoldGraph &g, std::vector<edge_desc> mst_edge
 	}
 }
 
+// prints the backbone sign assignment
 void print_sign_assignment(ScaffoldGraph &g, int *signs){
 	int length = num_vertices(g);
 	puts("Printing backbone sign assignment...");
@@ -104,7 +105,6 @@ void backbone_sign_assignment( ScaffoldGraph &g, int root, int *signs ) {
 	// propagate signs along the edges using the majority labels
 	signs[ root ] = POSITIVE;
     generate_sign_assignment( g, mst_edges, labels, root, signs );
-    print_sign_assignment(g, signs);
 }
 
 
