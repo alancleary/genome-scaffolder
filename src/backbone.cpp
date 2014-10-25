@@ -92,12 +92,30 @@ void print_sign_assignment(ScaffoldGraph &g, int *signs){
 	puts("");
 }
 
+void print_labels(ScaffoldGraph &g, int *labels, int size){
+	edge_itr ei, ei_end;
+	puts("Printing labels...");
+	int start, end, label;
+	for( tie( ei, ei_end ) = edges( g ); ei != ei_end; ++ei ){
+		start = g[ *ei ].source.index;
+		end = g[ *ei ].target.index;
+		label = g [ *ei ].label;
+		printf("start: %d, end: %d, label: %d\n", start, end, label);
+	}
+	puts("");
+}
 
 // constructs spanning tree from majority weights and makes sign assignment with spanning tree majority labels
 void backbone_sign_assignment( ScaffoldGraph &g, int root, int *signs ) {
 	// assign neighbor weights and majority labels to the graph edges
-    int labels[ num_edges( g ) ];
+	int labels_size = num_edges(g);
+    int labels[ labels_size ];
+
     assign_neighbor_weights_and_generate_labels( g, labels );
+
+    //print label assignments
+    print_labels(g, labels, labels_size);
+
 	// find a minimum spanning tree using the weights
     std::vector<edge_desc> mst_edges;
     //property_map<ScaffoldGraph, int ScaffoldEdge::*>::type weight_property_map = get(&ScaffoldEdge::weight, g);
