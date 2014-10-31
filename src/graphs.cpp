@@ -181,9 +181,17 @@ ScaffoldGraph generate_bundled_graph( const InitialGraph &g ) {
     return bundled;
 }
 
-//prints the Scaffold Graph
+//prints the Scaffold Graph (after edge bundling)
 void print(ScaffoldGraph &g){
-    puts("\nprinting graph");
+    puts("\nprinting graph after edge bundling");
+    puts("---------------");
+    print_graph(g);
+    puts("");
+}
+
+//prints the Initial Scaffold Graph (before edge bundling)
+void print(InitialGraph &g){
+    puts("\nprinting intial graph before edge-bundling");
     puts("---------------");
     print_graph(g);
     puts("");

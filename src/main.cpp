@@ -21,6 +21,9 @@ int main( int argc, char *argv[] ) {
 	puts("generating scaffold graph");
     InitialGraph ig = generate_synthetic_graph( num_verts, num_arcs, num_errors );
 
+    //print initial graph (before edge bundling)
+    print(ig);
+
     // edge bundling
 	puts("performing edge bundling");
 	ScaffoldGraph g = generate_bundled_graph( ig );

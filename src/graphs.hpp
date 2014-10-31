@@ -63,5 +63,6 @@ InitialGraph generate_synthetic_graph( int, int, int );
 int highest_degree( ScaffoldGraph& );
 ScaffoldGraph generate_bundled_graph( const InitialGraph& );
 void print(ScaffoldGraph&);
+void print(InitialGraph&);
 
 #endif /* GRAPHS_HPP */
