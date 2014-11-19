@@ -55,58 +55,136 @@ int num_sign_violations( const ScaffoldGraph &g, const int *signs ) {
 	return n;
 }
 
+// filtered graph for approximate fas
+// only leaves edges that are NOT in the providided list
+struct FasVertexPredicate {
+    FasVertexPredicate() { }
+    FasVertexPredicate( const std::vector<directed_vertex_desc> vertices, const DirectedScaffoldGraph g ) : m_vertices( vertices ), m_g( g ) { }
+    //template <typename Vertex>
+    bool operator()( const directed_vertex_desc& v ) const {
+		return std::find( m_vertices.begin(), m_vertices.end(), v ) == m_vertices.end();
+	}
+    bool operator()( const directed_edge_desc& e ) const {
+		return std::find( m_vertices.begin(), m_vertices.end(), source( e, m_g ) ) == m_vertices.end() && std::find( m_vertices.begin(), m_vertices.end(), target( e, m_g ) ) == m_vertices.end();
+	}
+    std::vector<directed_vertex_desc> m_vertices;
+    DirectedScaffoldGraph m_g;
+};
+
+typedef filtered_graph<DirectedScaffoldGraph, FasVertexPredicate> FasFilteredScaffoldGraph;
+typedef graph_traits<FasFilteredScaffoldGraph>::vertex_iterator fas_filtered_vertex_itr;
+typedef graph_traits<FasFilteredScaffoldGraph>::edge_descriptor fas_filtered_edge_desc;
+
 // a fast and effective heuristic for the feedback arc set problem (1993)
-/*
 int approximate_fas( const DirectedScaffoldGraph &g, int* fas ) {
-    // make a copy of the graph we can destroy
-    DirectedScaffoldGraph clone;
-    copy_graph( g, clone );
+    puts("approx fas");
+    // make a "copy" of the graph we can destroy
+    int num_verts = num_vertices( g );
+    std::vector<directed_vertex_desc> removed;
+    FasVertexPredicate vertex_filter( removed, g );
+    puts("first filtered graph");
+    FasFilteredScaffoldGraph* fg_pointer = new FasFilteredScaffoldGraph( g, vertex_filter ); // do we really need a pointer?
     // a vector to hold sinks
 	std::vector<int> sinks;
     // a vector to hold sources
 	std::vector<int> sources;
 
     // run the heuristic
-    while( num_vertices( clone ) > 0 ) {
-        std::vector<int> remove;
+    fas_filtered_vertex_itr fi, fi_end;
+    while( num_verts != removed.size() ) {
         // find all sinks and sources
-        for( int i = 0; i < num_vertices( clone ); i++ ) {
-            if( in_degree( i, clone ) > 0 && out_degree( i, clone ) == 0 ) {
-                sinks.push_back( i );
-                remove.push_back( i );
-            } else if( in_degree( i, clone ) == 0 && out_degree( i, clone ) > 0 ) {
-                sources.push_back( i );
-                remove.push_back( i );
+        puts("finding sinks and sources");
+        for( tie( fi, fi_end ) = vertices( *fg_pointer ); fi != fi_end; ++fi ) {
+            printf("vertex: %d\n", *fi);
+            if( in_degree( *fi, *fg_pointer ) > 0 && out_degree( *fi, *fg_pointer ) == 0 ) {
+                sinks.push_back( *fi );
+                removed.push_back( *fi );
+                printf("%d is a sink\n", *fi );
+            } else if( in_degree( *fi, *fg_pointer ) == 0 && out_degree( *fi, *fg_pointer ) > 0 ) {
+                sources.push_back( *fi );
+                removed.push_back( *fi );
+                printf("%d is a source\n", *fi);
             }
         }
-        // sort the list of vertices to be removed so reindexing doesn't throw us off
-        if( num_vertices( clone ) > 0 ) {
+        // remove the sinks and sources
+        puts("first delete");
+        FasVertexPredicate vertex_filter( removed, g );
+        delete fg_pointer;
+        puts("new graph");
+        fg_pointer = new FasFilteredScaffoldGraph( g, vertex_filter );
+        // remove a maximal degree vertice
+        puts("removing maximal degree");
+        if( num_verts != removed.size() ) {
             // choose a vertex u for which delta( u ) (outdegree - indegree) is a maximum
-            int max_delta = 0;
+            int max_delta = -num_verts;
             int max_vertex;
-            for( int i = 0; i < num_vertices( clone ); i++ ) {
-                int degree = out_degree( i, clone ) - in_degree( i, clone );
+            for( tie( fi, fi_end ) = vertices( *fg_pointer ); fi != fi_end; ++fi ) {
+                printf("considering: %d\n", *fi);
+                int degree = out_degree( *fi, *fg_pointer ) - in_degree( *fi, *fg_pointer );
                 if( degree > max_delta ) {
                     max_delta = degree;
-                    max_vertex = i;
+                    max_vertex = *fi;
                 }
             }
             // add the vertex to the ordering
             sources.push_back( max_vertex );
             // remove the vertex from the graph
-            remove_vertex( max_vertex, clone );
+            // remove_vertex was never implemented for subgraphs...
+            removed.push_back( max_vertex );
+            printf("%d is of maximal degree\n", max_vertex);
+            puts("second delete");
+            FasVertexPredicate vertex_filter( removed, g );
+            delete fg_pointer;
+            puts("new graph");
+            fg_pointer = new FasFilteredScaffoldGraph( g, vertex_filter );
         }
     }
+    puts("deleting pointer");
+    delete fg_pointer;
 
     // concatinate sources and sinks to make and ordered list
     std::vector<int> ordering;
     ordering.reserve( sources.size() + sinks.size() ); // preallocate memory
     ordering.insert( ordering.end(), sources.begin(), sources.end() );
     ordering.insert( ordering.end(), sinks.begin(), sinks.end() );
+    // all the edges that violate the order are feedback arcs
+    int fas_count = 0;
+    /*
+    puts("sinks");
+    for( std::vector<int>::iterator it = sinks.begin(); it != sinks.end(); ++it) {
+        printf("%d\n", *it);
+    }
+    puts("sources");
+    for( std::vector<int>::iterator it = sources.begin(); it != sources.end(); ++it) {
+        printf("%d\n", *it);
+    }
+    puts("ordering");
+    for( std::vector<int>::iterator it = ordering.begin(); it != ordering.end(); ++it) {
+        printf("%d\n", *it);
+    }
+    */
+    puts("iterating removed vertices");
+    // edges that are left facing with respect to the ordering are considered feedback arcs
+    for( std::vector<int>::iterator it = ordering.begin(); it != ordering.end(); ++it) {
+        std::vector<int>::iterator jt = it;
+        ++jt;
+        for( jt; jt != ordering.end(); ++jt ) {
+            bool b;
+            directed_edge_desc e;
+            printf("getting edge: %d->%d\n", *jt, *it);
+            tie( e, b ) = edge( *jt, *it, g );
+            puts("checking b");
+            if( b ) {
+                //fas[ indices[ e ] ] = 1;
+                fas[ get( edge_index, g, e ) ];
+                fas_count++;
+            }
+        }
+    }
     //the sequence induces a FAS on the graph
-    return -1;
+    puts("found approx fas");
+    return fas_count;
 }
-*/
 
 // function prototype
 template<typename T_in,typename T_out>
@@ -158,8 +236,8 @@ int num_order_violations( const ScaffoldGraph &g, const int *signs, int *fas ) {
 		if( components[ i ].size() > 2 ) {
 			DirectedScaffoldGraph& sdg = dg.create_subgraph( components[ i ].begin(), components[ i ].end() );
 			int sfas[ num_edges( fg ) ];
-			n += integer_linear_program<IloIntVarArray, int>( sdg, sfas );
-            //n += approximate_fas( sdg, sfas );
+			//n += integer_linear_program<IloIntVarArray, int>( sdg, sfas );
+            n += approximate_fas( sdg, sfas );
 			// add sfas to fas
 			j = 0;
 			for( tie( dei, dei_end ) = edges( sdg ); dei != dei_end; ++dei ) {
