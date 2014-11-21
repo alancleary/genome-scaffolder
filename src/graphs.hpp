@@ -53,10 +53,17 @@ typedef property_map<ScaffoldGraph, edge_index_t>::type edge_index_map;
 typedef subgraph<ScaffoldGraph> SubScaffoldGraph;
 
 // directed scaffold graph
-typedef subgraph< adjacency_list<vecS, vecS, bidirectionalS, property<vertex_color_t, int>, property<edge_index_t, int> > > DirectedScaffoldGraph;
+typedef subgraph< adjacency_list<vecS, vecS, bidirectionalS, no_property, property<edge_index_t, int> > > DirectedScaffoldGraph;
 typedef graph_traits<DirectedScaffoldGraph>::edge_iterator directed_edge_itr;
+typedef graph_traits<DirectedScaffoldGraph>::edge_descriptor directed_edge_desc;
 typedef graph_traits<DirectedScaffoldGraph>::vertex_iterator directed_vertex_itr;
-typedef property_map<DirectedScaffoldGraph, vertex_color_t>::type vertex_color_map;
+//typedef property_map<DirectedScaffoldGraph, vertex_color_t>::type vertex_color_map;
+typedef graph_traits<DirectedScaffoldGraph>::vertex_descriptor directed_vertex_desc;
+//typedef boost::property_map<DirectedScaffoldGraph, vertex_color_t>::type directed_color_map;
+//typedef property_map<DirectedScaffoldGraph, edge_index_t>::type directed_edge_index_map;
+
+// directed graph for feedbacl arc set
+//typedef adjacency_list<vecS, vecS, bidirectionalS, property<vertex_color_t, int>, no_property> FASGraph;
 
 // graph functions
 InitialGraph generate_synthetic_graph( int, int, int );
